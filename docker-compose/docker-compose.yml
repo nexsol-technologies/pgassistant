@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  pgassistant:
+    image: nexsoltech/pgassistant:1.0
+    restart: always
+    environment:
+      - OPENAI_API_KEY=mykey
+      - SECRET_KEY=NJ4ZP59OPE3LYEX7IPUKU7D0Y2ISZ2A
+    ports:
+      - "8080:5005"
+    volumes:
+      - ./myqueries.json:/home/pgassistant/myqueries.json

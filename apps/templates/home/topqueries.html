@@ -1,0 +1,87 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="py-4">
+
+      <div class="d-flex justify-content-between w-100 flex-wrap">
+          <div class="mb-3 mb-lg-0">
+              <h1 class="h4">Top queries</h1>
+              <p class="mb-0">You need to enable pg_stat_statements module to track statistics of SQL planning and execution</p>
+          </div>
+
+
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-secondary">Action</button>
+            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" id="dropdownMenuReference" data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="parent">
+                <svg class="icon icon-xs" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu py-0" aria-labelledby="dropdownMenuReference">
+                <li><a class="dropdown-item rounded-top" href="/enable_pg_statistics.html">Enable module</a></li>
+                <li><a class="dropdown-item" href="/reset_pg_statistics.html">Clear statistics</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item rounded-bottom" href="https://www.postgresql.org/docs/current/pgstatstatements.html" target="_blank">Documentation</a></li>
+            </ul>
+          </div>        
+  </div>
+
+  <div class="card border-0 shadow mb-4">
+    <div class="card-body">
+      <div class="table-responsive">
+          <table class="table table-centered table-nowrap mb-0 rounded" style="width: 600px" >
+              <thead class="thead-light">
+                  
+                  <tr>
+                    <th class="border-0 rounded-start">Analyze</th>
+                      {%for row in rows[0]: %}
+                      <th class="border-0 rounded-start">{{ row }}</th>                     
+                      {% endfor %}
+                  </tr>
+              </thead>
+              <tbody>
+                  <!-- Item -->
+                  {%for row in rows: %}
+                  <tr>
+                  {% set x = namespace(value=0) %}     
+                    
+                  {%for value in row %}
+                  {% set x.value = x.value + 1 %}                              
+                        {% if x.value == 1 %}
+                        
+                        {% if 'EXPLAIN ANALYZE' not in row[value] %}
+                        <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal">
+                            <button onclick="location.href='/analyze/{{ row['queryid'] }}'" type="button" class="btn btn-info d-inline-flex align-items-center">
+                                <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 11.25 1.5 1.5.75-.75V8.758l2.276-.61a3 3 0 1 0-3.675-3.675l-.61 2.277H12l-.75.75 1.5 1.5M15 11.25l-8.47 8.47c-.34.34-.8.53-1.28.53s-.94.19-1.28.53l-.97.97-.75-.75.97-.97c.34-.34.53-.8.53-1.28s.19-.94.53-1.28L12.75 9M15 11.25 12.75 9">
+                                </path></svg>
+                            </button>
+                        </td>
+                        {% else %}
+                        <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal"></td>
+                        {% endif %}
+                       
+                        {% endif %}
+                        <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal">      
+                        {{ row[value] }}
+                        </td>              
+                   {% endfor %}                     
+                  </tr>
+                  {% endfor %}  
+              </tbody>
+          </table>
+      </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

@@ -1,0 +1,67 @@
+/**
+ * = Images
+ */
+ .image-xl {
+    height: 20rem;
+    img{
+        height: 20rem;
+    }
+}
+
+.image-lg {
+    height: 12rem;
+    img{
+        height: 12rem;
+    }
+}
+
+.image-md{
+    height: 5.5rem;
+    img{
+        height: 5.5rem;
+    }
+}
+
+.image-sm {
+    height: 3rem;
+    img{
+        height: 3rem;
+    }
+}
+
+.image-xs {
+    height: 1.5rem;
+    img{
+        height: 1.5rem;
+    }
+}
+
+.image-small {
+    height: 1rem;
+    img{
+        height: 1rem;
+    }
+}
+
+.full-image{
+    height:100%;
+}
+
+
+.language-flag{
+    width: auto;
+    height: 1rem;
+    margin-right: 0.4rem;
+    position: relative;
+    top: -2px;
+}
+
+.home-pattern{
+    fill: $gray-100;
+}
+
+.form-bg-image {
+    background-repeat: no-repeat!important;
+    background-position: top center!important;
+}
+

@@ -1,0 +1,275 @@
+{
+"sql":
+[
+        {
+            "id": "db_version",
+            "description": "Database version",
+            "category": "Database",        
+            "sql": "SHOW server_version;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/sql-show.html"
+        },
+        {
+            "id": "db_size",
+            "description": "Database size",            
+            "category": "Database",        
+            "sql": "select pg_size_pretty(pg_database_size('$1'));",
+            "type": "param_query"
+        },
+        {
+            "id": "db_cache",
+            "description": "Database hit cache ratio",            
+            "category": "Database",        
+            "sql": "SELECT round (100*sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)),2)::float as ratio FROM pg_statio_user_tables;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STATIO-ALL-TABLES-VIEW"
+        },
+        {
+            "id": "table_size",
+            "description": "All tables size",                        
+            "category": "Table",        
+            "sql": "select table_name, pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size, pg_total_relation_size(quote_ident(table_name)) from information_schema.tables where table_schema  not in ('pg_catalog','information_schema') order by 3 desc;",
+            "type": "select"
+        },
+        {
+            "id": "table_size_top_5",
+            "description": "Top 5 tables size",                        
+            "category": "Table",        
+            "sql": "select table_name, pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size, pg_total_relation_size(quote_ident(table_name)) from information_schema.tables where table_schema  not in ('pg_catalog','information_schema') order by 3 desc limit 5;",
+            "type": "select"
+        },        
+        {
+            "id": "table_io",
+            "category": "Table",
+            "description": "All tables IO",
+            "sql": "SELECT * from pg_statio_user_tables order by heap_blks_read desc;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STATIO-ALL-TABLES-VIEW"
+        },        
+        {
+            "id": "users",
+            "category": "Database",
+            "description": "Database users",                          
+            "sql": "SELECT pg_user.usename || case when pg_user.usesuper THEN ' (Super user)' else '' end as username FROM pg_catalog.pg_user;",
+            "type": "select"
+        },
+        {
+            "id": "pg_stat_statements_enable",
+            "description": "Enable module pg_stat_statements",
+            "category": "Database",  
+            "sql": "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;",
+            "type": "exec"
+        },
+        {
+            "id": "pg_stat_statements_reset",
+            "description": "Reset pg_stat_statements statistics",            
+            "category": "Database",  
+            "sql": "SELECT pg_stat_statements_reset();",
+            "type": "exec"
+        },    
+        {
+            "id": "top_queries",
+            "description": "Top 50 queries",
+            "category": "Query",  
+            "sql": "select query, calls, rows, total_exec_time,mean_exec_time,min_exec_time,max_exec_time,stddev_exec_time,shared_blks_hit/(shared_blks_hit+shared_blks_read)::NUMERIC*100 hit_cache_ratio,shared_blks_hit,shared_blks_read,shared_blks_written,shared_blks_dirtied,local_blks_hit,local_blks_read,local_blks_dirtied,temp_blks_read,temp_blks_written,blk_read_time,blk_write_time,wal_records,wal_fpi,wal_bytes,queryid from pg_stat_statements where shared_blks_hit > 0 and query not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' order by total_exec_time desc limit 50",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"
+        },
+        {
+            "id": "index_seqscan",
+            "description": "Tables with sequential scans",
+            "category": "Indexe",
+            "sql": "SELECT relname, seq_scan, seq_tup_read / seq_scan AS tup_per_scan,(select query from pg_stat_statements where lower(query) like '%'||relname||'%' and query not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' order by total_exec_time desc limit 1 ) FROM pg_stat_user_tables WHERE seq_scan > 0 order by seq_scan desc limit 10;",
+            "type": "select"
+        },
+        {
+            "id": "index_unused",            
+            "category": "Indexe",
+            "description": "Unused indexes",
+            "sql": "select a.schemaname, a.relname, a.indexrelname, b.indexdef from pg_stat_user_indexes a ,pg_indexes b where a.schemaname=b.schemaname and a.relname=b.tablename and a.indexrelname=b.indexname and a.idx_scan = 0 order by a.relname,a.indexrelname;",
+            "type": "select"
+        },
+        {
+            "id": "index_usage",
+            "category": "Indexe",
+            "description": "Indexes usage",
+            "sql": "SELECT relname, 100 * idx_scan / (seq_scan + idx_scan) percent_of_times_index_used, n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ALL-TABLES-VIEW"
+        },
+        {
+            "id": "index_io",
+            "category": "Indexe",
+            "description": "Indexes IO",
+            "sql": "SELECT relname,indexrelname,idx_blks_read,idx_blks_hit FROM pg_statio_user_indexes order by idx_blks_read desc;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STATIO-ALL-INDEXES-VIEW"
+        },
+        {
+            "id": "index_definition",
+            "category": "Indexe",
+            "description": "Indexes definitions",
+            "sql": "SELECT indexname, indexdef FROM pg_indexes WHERE indexname not like 'pg_%' ORDER BY indexname;",
+            "type": "select"
+        },
+        {
+            "category": "Issue",
+            "id": "issue_idx_redundant",
+            "description": "Issue - Redundant indexes",
+            "sql": "with fk_indexes as ( select n.nspname as schema_name, ci.relname as index_name, cr.relname as table_name, (confrelid::regclass)::text as fk_table_ref, array_to_string(indclass, ', ') as opclasses from pg_index i join pg_class ci on ci.oid = i.indexrelid and ci.relkind = 'i' join pg_class cr on cr.oid = i.indrelid and cr.relkind = 'r' join pg_namespace n on n.oid = ci.relnamespace join pg_constraint cn on cn.conrelid = cr.oid left join pg_stat_user_indexes si on si.indexrelid = i.indexrelid where contype = 'f' and i.indisunique is false and conkey is not null and ci.relpages > 0 and si.idx_scan < 10 ), index_data as ( select *, (select string_agg(lpad(i, 3, '0'), ' ') from unnest(string_to_array(indkey::text, ' ')) i) as columns, array_to_string(indclass, ', ') as opclasses from pg_index i join pg_class ci on ci.oid = i.indexrelid and ci.relkind = 'i' where indisvalid = true and ci.relpages > 0 ), redundant_indexes as ( select i2.indexrelid as index_id, tnsp.nspname AS schema_name, trel.relname AS table_name, pg_relation_size(trel.oid) as table_size_bytes, irel.relname AS index_name, am1.amname as access_method, (i1.indexrelid::regclass)::text as reason, i1.indexrelid as reason_index_id, pg_get_indexdef(i1.indexrelid) main_index_def, pg_size_pretty(pg_relation_size(i1.indexrelid)) main_index_size, pg_get_indexdef(i2.indexrelid) index_def, pg_relation_size(i2.indexrelid) index_size_bytes, s.idx_scan as index_usage, quote_ident(tnsp.nspname) as formated_schema_name, coalesce(nullif(quote_ident(tnsp.nspname), 'public') || '.', '') || quote_ident(irel.relname) as formated_index_name, quote_ident(trel.relname) AS formated_table_name, coalesce(nullif(quote_ident(tnsp.nspname), 'public') || '.', '') || quote_ident(trel.relname) as formated_relation_name, i2.opclasses from index_data as i1 join index_data as i2 on ( i1.indrelid = i2.indrelid and i1.indexrelid <> i2.indexrelid ) inner join pg_opclass op1 on i1.indclass[0] = op1.oid inner join pg_opclass op2 on i2.indclass[0] = op2.oid inner join pg_am am1 on op1.opcmethod = am1.oid inner join pg_am am2 on op2.opcmethod = am2.oid join pg_stat_user_indexes as s on s.indexrelid = i2.indexrelid join pg_class as trel on trel.oid = i2.indrelid join pg_namespace as tnsp on trel.relnamespace = tnsp.oid join pg_class as irel on irel.oid = i2.indexrelid where not i2.indisprimary and not ( i2.indisunique and not i1.indisprimary ) and am1.amname = am2.amname and i1.columns like (i2.columns || '%') and i1.opclasses like (i2.opclasses || '%') and pg_get_expr(i1.indexprs, i1.indrelid) is not distinct from pg_get_expr(i2.indexprs, i2.indrelid) and pg_get_expr(i1.indpred, i1.indrelid) is not distinct from pg_get_expr(i2.indpred, i2.indrelid) ), redundant_indexes_fk as ( select ri.*, ( select count(1) from fk_indexes fi where fi.fk_table_ref = ri.table_name and fi.opclasses like (ri.opclasses || '%') ) > 0 as supports_fk from redundant_indexes ri ), redundant_indexes_tmp_num as ( select row_number() over () num, rig.* from redundant_indexes_fk rig order by index_id ), redundant_indexes_tmp_cut as ( select ri1.*, ri2.num as r_num from redundant_indexes_tmp_num ri1 left join redundant_indexes_tmp_num ri2 on ri2.reason_index_id = ri1.index_id and ri1.reason_index_id = ri2.index_id where ri1.num < ri2.num or ri2.num is null ), redundant_indexes_cut_grouped as ( select distinct(num), * from redundant_indexes_tmp_cut order by index_size_bytes desc ), redundant_indexes_grouped as ( select distinct(num), * from redundant_indexes_tmp_cut order by index_size_bytes desc ) select schema_name, table_name, table_size_bytes, index_name, access_method, string_agg(distinct reason, ', ') as redundant_to, string_agg(main_index_def, ', ') as main_index_def, string_agg(main_index_size, ', ') as main_index_size, index_def, index_size_bytes, index_usage, supports_fk from redundant_indexes_cut_grouped group by index_id, schema_name, table_name, table_size_bytes, index_name, access_method, index_def, index_size_bytes, index_usage, supports_fk order by index_size_bytes desc;",
+            "type": "select"
+        },
+        {
+            "category": "Issue",
+            "id": "issue_idx_duplicate",
+            "description": "Issue - Duplicate indexes",
+            "sql": "SELECT indrelid::regclass AS tablename,array_agg(indexrelid::regclass) AS Indexes FROM pg_index GROUP BY indrelid ,indkey HAVING COUNT(*) > 1;",
+            "type": "select"
+        },
+        {
+            "category": "Issue",
+            "id": "issue_idx_fk_missing",
+            "description": "Issue - Indexes missing on foreign keys",
+            "sql": "SELECT distinct table_name, 'CREATE INDEX idx_' || table_name || '_' || column_name || ' ON '   || foreign_schema || '.' || table_name || '(' || column_name || ');'  FROM (   SELECT    n.nspname AS schema,    cl.relname AS table_name,    a.attname AS column_name,    ct.conname AS key_name,    nf.nspname AS foreign_schema,    clf.relname AS foreign_table_name,    af.attname AS foreign_column_name,    pg_get_constraintdef(ct.oid) AS create_sql   FROM     pg_catalog.pg_attribute a   JOIN pg_catalog.pg_class cl     ON a.attrelid = cl.oid AND cl.relkind = 'r'   JOIN pg_catalog.pg_namespace n     ON n.oid = cl.relnamespace   JOIN pg_catalog.pg_constraint ct     ON a.attrelid = ct.conrelid     AND ct.confrelid != 0    AND ct.conkey[1] = a.attnum   JOIN pg_catalog.pg_class clf     ON ct.confrelid = clf.oid     AND clf.relkind = 'r'   JOIN pg_catalog.pg_namespace nf     ON nf.oid = clf.relnamespace   JOIN pg_catalog.pg_attribute af    ON af.attrelid = ct.confrelid    AND af.attnum = ct.confkey[1]  ) X",
+            "type": "select"
+        },
+        {
+            "description": "Tables without primary keys",
+            "category": "Issue",
+            "id": "issue_no_pk",
+            "sql": " select tab.table_schema, tab.table_name from information_schema.tables tab  left join information_schema.table_constraints tco  on tab.table_schema = tco.table_schema  and tab.table_name = tco.table_name  and tco.constraint_type = 'PRIMARY KEY'  where tab.table_type = 'BASE TABLE'  and tab.table_schema not in ('information_schema','pg_catalog')  and tco.constraint_name is null order by tab.table_schema,tab.table_schema,table_name;",
+            "type": "select"   
+        },
+        {
+            "category": "Issue",
+            "id": "issue_column_diff_type",
+            "description": "Columns with different data types",
+            "sql": "SELECT table_name, column_name, data_type FROM information_schema.columns a where column_name in (select column_name FROM information_schema.columns b where a.column_name = b.column_name and a.data_type != b.data_type and a.table_name != b.table_name and b.table_schema='public') and a.table_schema='public' ORDER BY column_name, table_name;",
+            "type": "select"
+        },                
+        {
+            "category": "Database",
+            "id": "database_modules",
+            "description": "Database modules",
+            "sql": "SELECT * FROM pg_extension;",
+            "type": "select"
+        },
+        {
+            "category": "Database",
+            "id": "database_settings",
+            "description": "Database settings",
+            "sql": "select category, name, setting from pg_settings;",
+            "type": "select"           
+        },
+        {
+            "category": "Database",
+            "id": "database_archive_settings",
+            "description": "Database archive settings",
+            "sql": "select category, name, setting from pg_settings where name like 'archive%' or name like '%wal%';;",
+            "type": "select"             
+        },
+        {
+            "category": "Database",
+            "id": "database_activity",
+            "description": "Database activity",
+            "sql": "SELECT datname, usename, query, application_name, client_addr, backend_start, state FROM pg_stat_activity where datname!='None' order by state,application_name,backend_start;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW"
+        },
+        {
+            "category": "Database",
+            "id": "database_count_connexions",
+            "description": "Count active connexions",
+            "sql": "SELECT count(*) as nb FROM pg_stat_activity where datname!='None'",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW"
+        },
+        {
+            "category": "Database",
+            "id": "database_count_conlicts",
+            "description": "Database count conflicts",
+            "sql": "SELECT sum(confl_tablespace+confl_lock+confl_snapshot+confl_bufferpin+confl_deadlock+confl_active_logicalslot) as nb from pg_stat_database_conflicts;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-DATABASE-CONFLICTS-VIEW"
+        },                
+        {
+            "category": "Database",
+            "id": "database_running_queries",
+            "description": "Running queries",
+            "sql": "SELECT datname, usename, query, application_name, client_addr, backend_start, state FROM pg_stat_activity where datname!='None' and state !='idle' order by state,application_name,backend_start;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW"
+        },
+        {
+            "category": "Database",
+            "id": "database_schemas",
+            "description": "Database schemas",
+            "sql": "SELECT *  FROM information_schema.schemata;",
+            "type": "select"
+        },
+        {
+            "category": "Database",
+            "id": "database_conflicts",
+            "description": "Database conflicts",
+            "sql": "SELECT * from pg_stat_database_conflicts;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-DATABASE-CONFLICTS-VIEW"
+        },
+
+        {
+            "category": "Database",
+            "id": "database_wal_size",
+            "description": "Database wal size",
+            "sql": "SELECT ( a.wals::int * b.wal_seg_size::int / 1024 / 1024 ) AS WAL_Space_Used_MB FROM (SELECT count(*) wals FROM   pg_ls_dir('pg_wal') WHERE  pg_ls_dir ~ '^[0-9A-F]{24}') a,( SELECT  setting wal_seg_size FROM pg_settings WHERE   name = 'wal_segment_size') b;",
+            "type": "select",
+            "reference": "https://www.pythian.com/blog/technical-track/monitoring-transaction-logs-in-postgresql"
+        },
+        {
+            "category": "Database",
+            "id": "pg_stat_wal",
+            "description" : "Database pg_stat_wal (Postgresql>=14)",
+            "sql": "SELECT now() wal_capture_time, wal_records, wal_fpi, wal_bytes, wal_buffers_full, wal_write, wal_write_time, wal_sync_time,stats_reset FROM pg_stat_wal;",
+            "type": "select",
+            "reference": "https://www.pythian.com/blog/technical-track/monitoring-transaction-logs-in-postgresql"
+        },
+        {
+            "category": "Table",
+            "id": "table_description",
+            "description" : "Table definition",
+            "sql": "select column_name, data_type, character_maximum_length, column_default, is_nullable from INFORMATION_SCHEMA.COLUMNS where table_name = '$1';",
+            "type": "param_query"
+        },         
+        {
+            "category": "Parameter query",
+            "id": "demo_1",
+            "description" : "Find a firstname",
+            "sql": "SELECT * from firstname where firstname like '%$1%' and gender='$2';",
+            "type": "param_query"
+        },
+        {
+            "id": "top_queries_on_object",
+            "description": "Top 50 queries on object",
+            "category": "Query",  
+            "sql": "select queryid, query, calls, rows, total_exec_time,mean_exec_time,min_exec_time,max_exec_time,stddev_exec_time,shared_blks_hit,shared_blks_read,shared_blks_written,shared_blks_dirtied,local_blks_hit,local_blks_read,local_blks_dirtied,temp_blks_read,temp_blks_written,blk_read_time,blk_write_time,wal_records,wal_fpi,wal_bytes   from pg_stat_statements where query not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' and lower (query) like '%$1%' order by total_exec_time desc limit 50",
+            "type": "param_query",
+            "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"
+        },
+        {
+            "id": "pgstat_get_sqlquery_by_id",
+            "description": "Get sql query by querid in pg_stat_statements",
+            "category": "Query",  
+            "sql": "select query from pg_stat_statements where queryid=$1",
+            "type": "param_query",
+            "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"            
+        },
+        {
+            "id": "database_profile",
+            "description": "DB Profile : amount of select, insert, update or delete",
+            "category": "Query",  
+            "sql": "WITH query_stats AS ( SELECT CASE WHEN lower(query) LIKE '%select%' THEN 'select' WHEN lower(query) LIKE '%insert%' THEN 'insert' WHEN lower(query) LIKE '%update%' THEN 'update' WHEN lower(query) LIKE '%delete%' THEN 'delete' END AS query_type, SUM(calls) AS total_calls, SUM(rows) AS total_rows, SUM(total_exec_time) AS total_exec_time, AVG(mean_exec_time) AS avg_mean_exec_time FROM pg_stat_statements WHERE lower(query) LIKE '%select%' OR lower(query) LIKE '%insert%' OR lower(query) LIKE '%update%' OR lower(query) LIKE '%delete%' GROUP BY query_type ), total_stats AS ( SELECT SUM(total_calls) AS grand_total_calls, SUM(total_exec_time) AS grand_total_exec_time FROM query_stats ) SELECT qs.query_type, qs.total_calls, qs.total_rows, round(qs.total_exec_time::numeric,2) as total_exec_time, round(qs.avg_mean_exec_time::numeric,3) as avg_mean_exec_time, round((qs.total_calls / ts.grand_total_calls) * 100,0) AS percentage_calls, round((qs.total_exec_time / ts.grand_total_exec_time)::numeric * 100,0) AS percentage_exec_time FROM query_stats qs, total_stats ts;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"            
+        }                     
+    ]
+}
+    

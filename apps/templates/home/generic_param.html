@@ -1,0 +1,68 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Settings {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+        <div class="row">
+        <div class="col-12 col-xl-8">
+            <div class="card card-body border-0 shadow mb-1">
+                <h2 class="h5 mb-1">Query with parameters / {{ description }}</h2>
+                <div>
+                    <code>{{ query }}</code>
+                </div>
+                <br>
+                <form method="POST">
+                    {%for param in parameters: %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div>
+                                <label for="param">Parameter {{ param }}</label>
+                                <input class="form-control" value="" id="{{ param }}" name="{{ param }}" type="text" placeholder="Enter parameter value" required>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="mt-3">
+                        <button class="btn btn-gray-800 mt-2 animate-up-2" type="submit">Submit</button>
+                    </div>                               
+                </form>
+            </div>
+            <div class="card border-0 shadow mb-4">
+                <div class="card-body">
+                  <div class="table-responsive">
+                      <table class="table table-centered table-nowrap mb-0 rounded" style="width: 600px" >
+                          <thead class="thead-light">
+                              <tr>
+                                  {%for row in rows[0]: %}
+                                  <th class="border-0 rounded-start">{{ row }}</th>                     
+                                  {% endfor %}
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <!-- Item -->
+                              {%for row in rows: %}
+                              <tr>          
+                              {%for value in row %}                    
+                                  <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal">
+                                      {{ row[value] }}
+                                  </td>
+                                  {% endfor %}                     
+                              </tr>
+                              {% endfor %}  
+                          </tbody>
+                      </table>
+                  </div>
+                </div>
+            </div>        
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

@@ -1,0 +1,102 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Settings {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+        <div class="row">
+        <div class="col-12 col-xl-8">
+            <div class="card card-body border-0 shadow mb-4">
+                <h2 class="h5 mb-4">Database connexion</h2>
+
+                <div class="mt-3">
+                <!-- Button Modal -->
+                    <button type="button" class="btn btn-block btn-info mb-3" data-bs-toggle="modal" data-bs-target="#modal-default">Read this
+                        <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"></path></svg>
+                        
+                    </button>
+                </div>
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div>
+                                <label for="db_host">Host name</label>
+                                <input class="form-control" value="{{ session['db_host'] }}" id="db_host" name="db_host" type="text" placeholder="Enter database hostname" required>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 mb-3">
+                            <div>
+                                <label for="db_port">Port</label>
+                                <input class="form-control" value="{{ session['db_port'] }}" id="db_port" name="db_port" type="number" placeholder="DB port" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="db_name">Database Name</label>
+                                <input class="form-control" value="{{ session['db_name'] }}" id="db_name" name="db_name" type="text" placeholder="Enter the database name" required>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 mb-3">
+                            <div class="form-group">
+                                <label for="db_user">User</label>
+                                <input class="form-control" value="{{ session['db_user'] }}" id="db_user" name="db_user" type="text" placeholder="Enter user name" required>
+                                
+                            </div>
+                        </div>
+                        <div class="col-sm-5 mb-3">
+                            <div class="form-group">
+                                <label for="db_password">Password</label>
+                                <input class="form-control" value="{{ session['db_password'] }}" id="db_password" name="db_password" type="password" placeholder="Enter user password" required/>
+                            </div>
+                        </div>                        
+                    </div>
+                    
+                        <label for="db_info">{{ dbinfo['error'] }}</label>
+                    
+                    <div class="mt-3">
+                        <button class="btn btn-primary" type="submit">Connect
+                            <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" 
+                                d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Modal Content -->
+                    <div class="modal fade" id="modal-default" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="h6 modal-title">General information</h2>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>PgAssistant needs pg_stat_statements module to be activated on Postgresql database.</p>
+                                    <p> You can find <a target="_blanck" href="https://github.com/nexsol-technologies/pgassistant-postgres-sample/tree/main" ><b>here</b></a> a way to do it.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-link text-gray ms-auto" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <!-- End of Modal Content -->   
+                </form>
+            </div>
+            
+        </div>
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

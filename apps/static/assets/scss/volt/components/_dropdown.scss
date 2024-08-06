@@ -1,0 +1,68 @@
+.dropdown-menu {
+    .dropdown-header,
+    .dropdown-item {
+        padding: .5rem 1rem;
+        font-size: $dropdown-font-size;
+        .dropdown-icon{
+            height: 1.25rem;
+            width:  1.25rem;
+        }
+    }
+
+    .dropdown-header {
+        color: $dropdown-header-color;
+        font-weight: $dropdown-header-font-weight;
+    }
+
+    .dropdown-item {
+        transition: $transition-base;
+        font-weight: $dropdown-item-font-weight;
+
+    }
+
+    .show & {
+        animation: show-dropdown .2s ease forwards;
+    }
+
+    &.dropdown-menu-xs {
+        min-width: 120px;
+        max-width: 120px;
+        @include box-shadow($box-shadow-sm);
+    }
+
+}
+
+// Dropown sizes
+.dropdown-menu-sm {
+    min-width: 100px;
+    border: $border-radius-lg;
+}
+
+.dropdown-menu-md {
+    min-width: 180px;
+    border: $border-radius-lg;
+}
+
+.dropdown-menu-lg {
+    min-width: 350px;
+    border-radius: $border-radius-lg;
+    @include media-breakpoint-down(sm) {
+        min-width: 300px;
+    }
+}
+
+
+
+// this helps when not only the button should toggle a dropdown
+[data-toggle]:hover {
+    cursor: pointer;
+}
+
+// remove the caret from Bootstrap by default
+.dropdown-toggle {
+    &:after, .dropend &:after, .dropstart &:before, .dropup &:after {
+        display: none;
+    }
+}
+
+

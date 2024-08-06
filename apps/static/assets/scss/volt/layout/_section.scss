@@ -1,0 +1,164 @@
+/**
+ * = Sections
+ */
+
+.section {
+    position: relative;
+    padding-top: $spacer * 3;
+    padding-bottom: $spacer * 3;
+}
+
+.section-header {
+    position: relative;
+    padding-top: $spacer * 9;
+    padding-bottom: $spacer * 3;
+}
+
+@include media-breakpoint-up(sm) {
+    .section {
+        position: relative;
+        padding-top: $spacer * 5;
+        padding-bottom: $spacer * 5;
+    }
+    .section-header {
+        position: relative;
+        padding-top: $spacer * 8;
+        padding-bottom: $spacer * 8;
+        &.section-sm{
+            padding-top: $spacer * 4;
+            padding-bottom: $spacer * 3;
+        }
+    }
+    .section-xl {
+        padding-top: $spacer * 8;
+        padding-bottom: $spacer * 8;
+    }
+    .section-lg {
+        padding-top: $spacer * 6;
+        padding-bottom: $spacer * 6;
+    }
+    .section-sm {
+        padding-top: $spacer * 3;
+        padding-bottom: $spacer * 3;
+    }
+}
+
+@include media-breakpoint-up(lg) {
+    .section {
+        position: relative;
+        padding-top: $spacer * 6;
+        padding-bottom: $spacer * 6;
+    }
+    .section-header {
+        position: relative;
+        padding-top: $spacer * 10;
+        padding-bottom: $spacer * 10;
+        &.section-sm{
+            padding-top: $spacer * 4;
+            padding-bottom: $spacer * 3;
+        }
+    }
+    .section-xl {
+        padding-top: $spacer * 10;
+        padding-bottom: $spacer * 10;
+    }
+    .section-lg {
+        padding-top: $spacer * 8;
+        padding-bottom: $spacer * 8;
+    }
+    .section-sm {
+        padding-top: $spacer * 4;
+        padding-bottom: $spacer * 4;
+    }
+}
+
+// Hero sections
+.section-hero {
+    @include media-breakpoint-up(md) {
+        height: 100vh;
+    }
+}
+
+//Section delimiter
+.line-bottom{
+    &::after{
+        content: '';
+        display: block;
+        width: 80%;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        margin-left: -40%;
+        height: 1px;
+        background: radial-gradient(ellipse at center,$light 0,rgba(255,255,255,0) 80%);
+    }
+}
+
+// Profile cover
+.section-profile-cover {
+    height: 580px;
+    background-size: cover;
+    background-position: center center;
+    @include media-breakpoint-down(md) {
+        height: 400px;
+    }
+}
+
+// Components section
+.components-section {
+    >.form-control {
+        +.form-control {
+            margin-top: .5rem;
+        }
+    }
+    >.nav+.nav,
+    >.alert+.alert,
+    >.navbar+.navbar,
+    >.progress+.progress,
+    >.progress+.btn,
+    .badge,
+    .btn {
+        margin-top: .5rem;
+        margin-bottom: .5rem;
+    }
+    .btn-group {
+        margin-top: .5rem;
+        margin-bottom: .5rem;
+        .btn {
+            margin: 0;
+        }
+    }
+    .alert {
+        margin: 0;
+        +.alert {
+            margin-top: 1.25rem;
+        }
+    }
+    .badge {
+        margin-right: .5rem;
+    }
+    .modal-footer {
+        .btn {
+            margin: 0;
+        }
+    }
+}
+
+.copy-docs {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    transition: $transition-base;
+    &.copied {
+        background: $success;
+    }
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.kanban-container{
+	overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+
+}

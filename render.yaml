@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: pgassistant
+    plan: starter
+    env: python
+    region: frankfurt  
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn run:app"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4

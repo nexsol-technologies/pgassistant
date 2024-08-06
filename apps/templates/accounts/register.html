@@ -1,0 +1,112 @@
+{% extends "layouts/base-fullscreen.html" %}
+
+{% block title %} Sign UP {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <main>
+        <section class="vh-lg-100 mt-5 mt-lg-0 bg-soft d-flex align-items-center">
+            <div class="container">
+                <p class="text-center">
+                    Open-source Flask Dashboard
+                </p>
+                <div class="row justify-content-center form-bg-image" data-background-lg="{{ config.ASSETS_ROOT }}/img/illustrations/signin.svg">
+                    <div class="col-12 d-flex align-items-center justify-content-center">
+                        <div class="bg-white shadow border-0 rounded border-light p-4 p-lg-5 w-100 fmxw-500">
+                            <div class="text-center text-md-center mb-4 mt-md-0">
+                                <h1 class="mb-0 h3">
+                                    Flask Volt - Sign UP
+                                </h1>
+                                <br />
+                                <p>
+                                    {% if msg %}
+                                        {{ msg | safe }}
+                                    {% else %}
+                                        Add your credentials
+                                    {% endif %}                                     
+                                </p> 
+                            </div>
+                            
+                            {% if success %}
+
+                                <div class="d-grid">
+                                    <a href="{{ url_for('authentication_blueprint.login') }}" 
+                                       class="btn btn-gray-800">Sign IN</a>
+                                </div>
+
+                            {% else %}
+
+                                <form method="post" action="" class="mt-4">
+                                    
+                                    {{ form.hidden_tag() }}
+
+                                    <div class="form-group mb-4">
+                                        <label for="email">Username</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text" id="basic-addon1">
+                                                <span class="fas fa-user-circle"></span>
+                                            </span>
+                                            {{ form.username(placeholder="Username", class="form-control") }}
+                                        </div>  
+                                    </div>
+
+                                    <!-- Form -->
+                                    <div class="form-group mb-4">
+                                        <label for="email">Your Email</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text" id="basic-addon1">
+                                                <span class="fas fa-envelope"></span>
+                                            </span>
+                                            {{ form.email(placeholder="Email", class="input form-control", type="email") }}
+                                        </div>  
+                                    </div>
+                                    <!-- End of Form -->
+                                    <div class="form-group">
+                                        <!-- Form -->
+                                        <div class="form-group mb-4">
+                                            <label for="password">Your Password</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text" id="basic-addon2">
+                                                    <span class="fas fa-unlock-alt"></span>
+                                                </span>
+                                                {{ form.password(placeholder="Password", class="form-control", type="password") }}
+                                            </div>  
+                                        </div>
+                                        <!-- End of Form -->
+                                        <div class="mb-4">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" value="" id="remember">
+                                                <label class="form-check-label fw-normal mb-0" for="remember">
+                                                    I agree to the <a href="#" class="fw-bold">terms and conditions</a>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" name="register" class="btn btn-gray-800">Sign UP</button>
+                                    </div>
+                                </form>
+                                <br />
+                                <div class="d-flex justify-content-center align-items-center mt-4">
+                                    <span class="fw-normal">
+                                        Already have an account? 
+                                        <a href="{{ url_for('authentication_blueprint.login') }}" class="fw-bold">Sign IN</a>
+                                    </span>
+                                </div>
+                            
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

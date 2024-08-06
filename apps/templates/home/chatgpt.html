@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Settings {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+        <div class="row">
+        <div class="col-12 col-xl-8">
+            <div class="card card-body border-0 shadow mb-1">
+                <h2 class="h5 mb-1">OpenAI Response</h2>
+                <div>
+                    <code></code>
+                </div>
+                <br>
+                <textarea class="form-control" name="chatgpt" id="chatgpt" rows="20">{{ chatgpt_response }}</textarea>
+            </div>        
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

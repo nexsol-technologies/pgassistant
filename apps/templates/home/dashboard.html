@@ -1,0 +1,319 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="row">
+
+        <div class="col-12 col-sm-6 col-xl-4 mb-4">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <div class="row d-block d-xl-flex align-items-center">
+                        <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                            <div class="icon-shape icon-shape-primary rounded me-4 me-sm-0">
+                                <svg class="icon" data-slot="icon" fill="none" stroke="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"></path></svg>
+                            </div>
+
+                        </div>
+                        <div class="col-12 col-xl-7 px-xl-0">
+                            <div class="d-none d-sm-block">
+                                <a target="blanck" href="https://www.postgresql.org/docs/release/">
+                                <h2 class="h6 text-gray-400 mb-0">Database version</h2>
+                                <h3 class="fw-extrabold mb-2">{{ dbinfo['version'] }}</h3>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-4 mb-4">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <div class="row d-block d-xl-flex align-items-center">
+                        <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                            <div class="icon-shape icon-shape-secondary rounded me-4 me-sm-0">
+                                <svg class="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"></path></svg>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-7 px-xl-0">
+                            <div class="d-none d-sm-block">
+                                <h2 class="h6 text-gray-400 mb-0">Database size</h2>
+                                <h3 class="fw-extrabold mb-2">{{ dbinfo['size'] }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-4 mb-4">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <div class="row d-block d-xl-flex align-items-center">
+                        <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                            <div class="icon-shape icon-shape-tertiary rounded me-4 me-sm-0">
+                                <svg class="icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-7 px-xl-0">
+                            <div class="d-none d-sm-block">
+                                <h2 class="h6 text-gray-400 mb-0"> Hit cache ratio</h2>
+                                <h3 class="fw-extrabold mb-2">{{ dbinfo['cache'] }} %</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-xl-8">
+            <div class="row">
+                <div class="col-12 col-xxl-6 mb-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-header border-bottom d-flex align-items-center justify-content-between">
+                            <h2 class="fs-5 fw-bold mb-0">Profile - Calls</h2>
+                              <a href="/generic/database_profile" class="btn btn-sm btn-primary">See all</a>
+                          </div>
+                        <div class="card-body">
+                            <!-- Project 1 -->
+                            {% for table in dbinfo['profile'] %}
+                            <div class="row align-items-center mb-3">
+                                <div class="col-auto">
+                                    <svg class="icon icon-sm text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div class="col">
+                                    <div class="progress-wrapper">
+                                        {% if table['query_type']=='select' %}
+                                        <div class="progress-info">
+                                            <div class="progress-label">
+                                                <span>{{ table['query_type'] }} </span>
+                                            </div>
+                                            <div class="progress-percentage">
+                                                <span>{{ table['percentage_calls'] }} % ({{ table['total_calls'] }} calls)</span>
+                                            </div>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ table['percentage_calls'] }}%;" aria-valuenow="{{ table['percentage_calls'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        {% elif table['query_type']=='insert' %}
+                                        <div class="progress-info">
+                                            <div class="progress-label">
+                                                <span class="text-success">{{ table['query_type'] }}</span>
+                                                
+                                            </div>
+                                            <div class="progress-percentage">
+                                                <span>{{ table['percentage_calls'] }} % ({{ table['total_calls'] }} calls)</span>
+
+                                            </div>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ table['percentage_calls'] }}%;" aria-valuenow="{{ table['percentage_calls'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        {% elif table['query_type']=='update' %}
+                                        <div class="progress-info">
+                                            <div class="progress-label">
+                                                <span class="text-secondary">{{ table['query_type'] }}</span>
+                                            </div>
+                                            <div class="progress-percentage">
+                                                <span>{{ table['percentage_calls'] }} % ({{ table['total_calls'] }} calls)</span>
+                                             
+                                            </div>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ table['percentage_calls'] }}%;" aria-valuenow="{{ table['percentage_calls'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        {% else %}
+                                        <div class="progress-info">
+                                            <div class="progress-label">
+                                                <span class="text-danger">{{ table['query_type'] }}</span>
+                                            </div>
+                                            <div class="progress-percentage">
+                                                <span>{{ table['percentage_calls'] }} % ({{ table['total_calls'] }} calls)</span>
+                                            </div>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ table['percentage_calls'] }}%;" aria-valuenow="{{ table['percentage_calls'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>        
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xxl-6 mb-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-header border-bottom d-flex align-items-center justify-content-between">
+                            <h2 class="fs-5 fw-bold mb-0">Profile - Time consume</h2>
+                              <a href="/generic/database_profile" class="btn btn-sm btn-primary">See all</a>
+                          </div>
+                        <div class="card-body">
+                            <!-- Project 1 -->
+                            {% for table in dbinfo['profile'] %}
+                            <div class="row align-items-center mb-3">
+                                <div class="col-auto">
+                                    <svg class="icon icon-sm text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div class="col">
+                                    <div class="progress-wrapper">
+                                        {% if table['query_type']=='select' %}
+                                        <div class="progress-info">
+                                            <div class="progress-label">
+                                                <span>{{ table['query_type'] }} </span>
+                                            </div>
+                                            <div class="progress-percentage">
+                                                <span>{{ table['percentage_exec_time'] }} % </span>
+                                            </div>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ table['percentage_exec_time'] }}%;" aria-valuenow="{{ table['percentage_exec_time'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        {% elif table['query_type']=='insert' %}
+                                        <div class="progress-info">
+                                            <div class="progress-label">
+                                                <span class="text-success">{{ table['query_type'] }}</span>
+                                                
+                                            </div>
+                                            <div class="progress-percentage">
+                                                <span>{{ table['percentage_exec_time'] }} % </span>
+
+                                            </div>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ table['percentage_exec_time'] }}%;" aria-valuenow="{{ table['percentage_exec_time'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        {% elif table['query_type']=='update' %}
+                                        <div class="progress-info">
+                                            <div class="progress-label">
+                                                <span class="text-secondary">{{ table['query_type'] }}</span>
+                                            </div>
+                                            <div class="progress-percentage">
+                                                <span>{{ table['percentage_exec_time'] }} % </span>
+                                             
+                                            </div>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ table['percentage_exec_time'] }}%;" aria-valuenow="{{ table['percentage_exec_time'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        {% else %}
+                                        <div class="progress-info">
+                                            <div class="progress-label">
+                                                <span class="text-danger">{{ table['query_type'] }}</span>
+                                            </div>
+                                            <div class="progress-percentage">
+                                                <span>{{ table['percentage_exec_time'] }} % </span>
+                                            </div>
+                                        </div>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ table['percentage_exec_time'] }}%;" aria-valuenow="{{ table['percentage_exec_time'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>        
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xxl-6 mb-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-header border-bottom d-flex align-items-center justify-content-between">
+                            <h2 class="fs-5 fw-bold mb-0">Top 5 tables</h2>
+                              <a href="/generic/table_size" class="btn btn-sm btn-primary">See all</a>
+                          </div>
+                        <div class="card-body">
+                            <!-- Project 1 -->
+                            {% for table in dbinfo['table_size'] %}
+                            <div class="row align-items-center mb-3">
+                                <div class="col-auto">
+                                    <svg class="icon icon-sm text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div class="col">
+                                    <div class="progress-wrapper">
+                                        <div class="progress-info">
+                                            <div class="h6 mb-0">{{ table['table_name'] }}</div>
+                                            <div class="small fw-bold text-gray-500"><span> {{ table['size'] }}</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>        
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <div class="col-12 col-xl-4">
+            
+            <div class="col-12 px-0 mb-4">
+                <div class="card border-0 shadow">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between border-bottom pb-3">
+                            <div>
+                                <div class="h6 mb-0 d-flex align-items-center">
+                                    <svg class="icon icon-xs text-gray-500 me-2" fill="green" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6" clip-rule="evenodd"></path></svg>
+                                    Connexions
+                                </div>
+                            </div>
+                            <div>
+                                <a href="/generic/database_activity" class="d-flex align-items-center fw-bold">
+                                    {{ dbinfo['connexions'] }}
+                                    <svg class="icon icon-xs text-gray-500 me-2"  viewBox="0 0 20 20" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between border-bottom py-3">
+                            <div>
+                                <div class="h6 mb-0 d-flex align-items-center">
+                                    <svg class="icon icon-xs text-gray-500 me-2" fill="red" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"></path></svg>
+                                    Conflicts
+                                </div>
+                            </div>
+                            <div>
+                                <a href="/generic/database_conflicts" class="d-flex align-items-center fw-bold">
+                                    {{ dbinfo['conflicts'] }}
+                                <svg class="icon icon-xs text-gray-500 me-2"  viewBox="0 0 20 20" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6"></path>
+                                </svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between pt-3">
+                            <div>
+                                <div class="h6 mb-0 d-flex align-items-center">
+                                    <svg class="icon icon-xs text-gray-500 me-2" fill="blue" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1H8a3 3 0 00-3 3v1.5a1.5 1.5 0 01-3 0V6z" clip-rule="evenodd"></path><path d="M6 12a2 2 0 012-2h8a2 2 0 012 2v2a2 2 0 01-2 2H2h2a2 2 0 002-2v-2z"></path></svg>
+                                    Running queries
+                                </div>
+
+                            </div>
+                            <div>
+                                <a href="/generic/database_running_queries" class="d-flex align-items-center fw-bold">
+                                    #2
+                                    <svg class="icon icon-xs text-gray-500 me-2"  viewBox="0 0 20 20" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6"></path>
+                                    </svg>
+                                 </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
