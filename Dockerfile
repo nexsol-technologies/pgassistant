@@ -1,5 +1,5 @@
 
-FROM python:3.9.19-alpine3.20
+FROM python:3.12.4-alpine3.20
 
 RUN apk update && apk upgrade && apk add postgresql-client && apk add util-linux
 RUN python -m pip install --upgrade pip
