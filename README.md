@@ -1,6 +1,10 @@
-# PgAssistant
-
-![Alt text](media/pgassistant.png?raw=true "pgAssistant")
+<p align="center">
+  <img src="media/pgassistant.png" alt="pgAssistant" height="120px"/>
+  <br>
+  <em>A PostgreSQL assistant for developers<br />
+      designed to help understand and optimize PostgreSQL database performance.</em>
+  <br>
+</p>
 
 PgAssistant is an open-source tool designed to help developers understand and optimize their PostgreSQL database performance. It provides insights into database behavior, identifies schema-related issues, and assists in correcting them. Additionally, PgAssistant makes it easy to manage a library of specific SQL queries useful for your project through a simple JSON file.
 
