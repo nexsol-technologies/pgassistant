@@ -1,0 +1,88 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Settings {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+        <div class="row">
+        <div class="col-12 col-xl-8">
+            <div class="card card-body border-0 shadow mb-4">
+                <h2 class="h5 mb-4">PG Tune</h2>
+
+
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div>
+                                <label class="my-1 me-2">DB Type</label>
+                                <select class="form-select" id="db_type" name="db_type" aria-label="Web application">
+                                    <option selected value="web">Web application</option>
+                                    <option value="oltp">Online transaction processing system</option>
+                                    <option value="dw">Data warehouse</option>
+                                </select>
+                            </div>
+                        </div>
+                    
+                    <div class="row"></div>
+                        <div class="col-sm-5 mb-3">
+                            <div>
+                                <label class="my-1 me-2" for="db_memory">Total Memory (RAM)</label>
+                                <input class="form-control" value="2" id="db_memory" name="db_memory" type="number" min="1" required>
+                                <label class="my-1 me-2" >Memory unit</label>
+                                <select class="form-select" id="db_memory_unity" name="db_memory_unity">
+                                    <option value="MB">MB</option>
+                                    <option selected value="GB">GB</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-3 mb-3">
+                            <div class="form-group">
+                                <label for="db_name">Number of CPUs</label>
+                                <input class="form-control" value="1" id="db_cpu" name="db_cpu" type="number" min="1" max="200" required>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 mb-3">
+                            <div class="form-group">
+                                <label for="db_user">Number of Connections</label>
+                                <input class="form-control" value="100" id="db_maxconn" name="db_maxconn" type="number" min="10" max="200" required>
+                                
+                            </div>
+                        </div>
+                        <div class="col-sm-5 mb-3">
+                            <div class="form-group">
+                                <label class="my-1 me-2" >Data Storage</label>
+                                <select class="form-select" id="db_storage" name="db_storage">
+                                    <option selected value="ssd">SSD Storage</option>
+                                    <option value="san">SAN Storage</option>
+                                    <option value="hdd">HDD Storage</option>
+                                    
+                                </select>                            
+                            </div>
+                        </div>                        
+                    </div>         
+                    
+                    <div class="mt-3">
+                        <button class="btn btn-primary" type="submit">Tune !
+                            <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" 
+                                d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"></path>
+                            </svg>
+                        </button>
+                    </div>             
+                </form>
+            </div>
+            
+        </div>
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

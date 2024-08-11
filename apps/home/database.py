@@ -7,6 +7,7 @@ import json
 import os
 import collections
 from flask import g
+from . import pgtune
 
 
 PGA_QUERIES={}
@@ -182,6 +183,16 @@ def db_query(cnx, query_id, db_name=None):
             else:
                 db_exec(cnx,sql)
 
+def get_my_queries():
+    if os.path.isfile("myqueries.json"):
+        rows=[]
+        with open("myqueries.json", encoding="utf-8") as f_in:
+            userqueries=json.load(f_in)
+        for query in userqueries['sql']:
+            rows.append(query)
+        return rows
+    return []
+
 def get_queries():
     # get the standard json queries
     global PGA_QUERIES
@@ -196,3 +207,35 @@ def get_queries():
                 userqueries=json.load(f_in)
             PGA_QUERIES['sql']=PGA_QUERIES['sql']+userqueries['sql']
             
+def get_pg_tune_parameter(db_config):
+    con, message = connectdb(db_config)
+    if con:
+        # get the the current setting of key pgtune run-time parameters.
+        running_values={}
+        params=['max_connections','shared_buffers','effective_cache_size',
+                'maintenance_work_mem','checkpoint_completion_target','wal_buffers',
+                'default_statistics_target','random_page_cost','effective_io_concurrency',
+                'work_mem','huge_pages','min_wal_size','max_wal_size',
+                'max_worker_processes','max_parallel_workers_per_gather',
+                'max_parallel_workers','max_parallel_maintenance_workers']
+        for aparam in params:
+            sql = 'SHOW ' + aparam + ';'
+            value=json.loads(db_fetch_json(con,sql))
+            running_values[aparam]=value[0][aparam]
+
+        # get the database version
+        version_raw, _= db_query(con,'db_version')
+        version=version_raw[0]['server_version']
+
+        # alter system command supported by versions >= 12
+        if '.' in version:
+            major=version.split('.',1)[0]
+        else:
+            major=version
+        
+        con.close()
+
+        return running_values, major
+
+
+

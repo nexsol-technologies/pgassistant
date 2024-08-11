@@ -1,0 +1,99 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="py-4">
+
+      <div class="d-flex justify-content-between w-100 flex-wrap">
+          <div class="mb-3 mb-lg-0">
+              <h1 class="h4">pgTUNE results</h1>
+              {% if major_version>=12 : %}
+              <p class="mb-0">Postgresql version : {{ major_version }}</p>
+              <p class="mb-0">Since v12, ALTER SYSTEM is used for changing server configuration parameters across the entire database cluster. It can be more convenient than the traditional method of manually editing the postgresql.conf file.</p>
+              {% endif %}
+          </div>
+
+
+        </div>   
+  </div>
+
+
+  <div class="row">
+    <div class="col-12">
+        <!-- Tab -->
+        <nav>
+            <div class="nav nav-tabs mb-4" id="nav-tab" role="tablist">
+                <a class="nav-item nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Parameters</a>
+                <a class="nav-item nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-apply" role="tab" aria-controls="nav-apply" aria-selected="false">Apply parameters</a>
+                <a class="nav-item nav-link" id="nav-contact-tab" data-bs-toggle="tab" href="#nav-docker" role="tab" aria-controls="nav-docker" aria-selected="false">Docker</a>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                <div class="card border-0 shadow mb-4">
+                    <div class="card-body">
+                      <div class="table-responsive">
+                          <table class="table table-centered table-nowrap mb-0 rounded" style="width: 600px" >
+                              <thead class="thead-light">
+                                  
+                                  <tr>
+                                    <th class="border-0 rounded-start">Parameter</th>
+                                    <th class="border-0 rounded-start">Actual value</th>
+                                    <th class="border-0 rounded-start">Tuned value</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <!-- Item -->
+                                  {% for header in running_values: %}
+                                  <tr>
+                                    <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal"> 
+                                        {{ header }}
+                                    </td>
+                                    <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal"> 
+                                        {{ running_values[header] }}
+                                    </td>
+                                    {% if running_values[header]!=tuned_values[header]: %}
+                                    <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal;color:rgb(43, 0, 255);"> 
+                                        <b>{{ tuned_values[header] }}</b>
+                                    </td>
+                                    {% else %}
+                                    <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal"> 
+                                        {{ tuned_values[header] }}
+                                    </td>
+                                    {% endif %}
+                                  </tr>
+                                  {% endfor %}                           
+                              </tbody>
+                          </table>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="nav-apply" role="tabpanel" aria-labelledby="nav-apply-tab">
+                <label for="textarea">ALTER SYSTEM : you need to restart the database after ALTER SYSTEM command</label>
+                <textarea class="form-control" name="sqlalter" id="sqlalter" rows="5">{{ sqlalter }}</textarea>
+            </div>
+            <div class="tab-pane fade" id="nav-docker" role="tabpanel" aria-labelledby="nav-docker-tab">
+                <label for="textarea">docker-compose.yml</label>
+                <textarea class="form-control" name="docker_cmd" id="docker_cmd" rows="20">{{ docker_cmd }}</textarea>
+            </div>
+        </div>
+        <!-- End of tab -->
+    </div>
+</div>
+
+
+
+
+
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

@@ -1,0 +1,13 @@
+{
+    "sql":
+    [
+            {
+                "id": "my_dbversion",
+                "description": "Database version",
+                "category": "Database",        
+                "sql": "SHOW server_version;",
+                "type": "select",
+                "reference": "https://www.postgresql.org/docs/current/sql-show.html"
+            }
+    ]
+}

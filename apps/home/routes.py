@@ -11,7 +11,9 @@ import sqlfluff
 from sqlfluff.core import FluffConfig
 from . import database
 from . import llm
+from . import pgtune
 import re
+
 
 def handle_database_post(segment: str):
     dbinfo = {}
@@ -43,6 +45,10 @@ def handle_topqueries_get(template: str, segment: str):
         return render_template(f"home/{template}", segment=segment, rows=rows)
     else:
         return redirect("/database.html")
+
+def handle_myqueries_get():
+    queries=database.get_my_queries()
+    return render_template(f"home/search.html", segment='search.html', rows=queries, searchkey='My queries')
 
 def handle_reset_pg_statistics():
     database.exec_cmd(session, "pg_stat_statements_reset")
@@ -78,6 +84,28 @@ def handle_search_post():
     rows = database.search(searchkey)
     return render_template("home/search.html", segment="search.html", rows=rows, searchkey=searchkey)
 
+def handle_pgtune_post():
+    db_cpu = request.form.get('db_cpu')
+    db_type = request.form.get('db_type')
+    db_memory = request.form.get('db_memory')
+    db_memory_unity = request.form.get('db_memory_unity')
+    db_maxconn = request.form.get('db_maxconn')
+    db_storage = request.form.get('db_storage')
+
+    running_values,major_version=database.get_pg_tune_parameter(session)
+    a_pgtune = pgtune.pgTune (major_version,db_cpu,db_memory+db_memory_unity,db_storage,db_type,db_maxconn)
+    
+    tuned_values = a_pgtune.get_pg_tune()
+    sqlalter = a_pgtune.get_alter_system(running_values)
+    docker_cmd = a_pgtune.get_docker_cmd(session, major_version)
+
+    return render_template("home/pgtune_result.html", segment="pgtune_result.html", 
+                           major_version=int(major_version),
+                           running_values=running_values, 
+                           tuned_values=tuned_values,
+                           sqlalter=sqlalter,
+                           docker_cmd=docker_cmd
+                           )
 
 @blueprint.route('/index')
 def index():
@@ -180,6 +208,10 @@ def route_template(template: str):
             return handle_lint_post()
         elif segment == "search.html" and request.method == 'POST':
             return handle_search_post()
+        elif segment == "pgtune.html" and request.method == 'POST':
+            return handle_pgtune_post()
+        elif segment == "myqueries.html":
+            return handle_myqueries_get()
         
         return render_template(f"home/{template}", segment=segment, dbinfo={})
 

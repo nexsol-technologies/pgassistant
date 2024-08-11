@@ -72,7 +72,7 @@
               <li class="nav-item {% if 'database_' in segment %} active {% endif %}">
                 <span
                   class="nav-link  collapsed  d-flex justify-content-between align-items-center"
-                  data-bs-toggle="collapse" data-bs-target="#submenu-app">
+                  data-bs-toggle="collapse" data-bs-target="#submenu-db">
                   <span>
                     <span class="sidebar-icon">
                       <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
@@ -84,35 +84,35 @@
                   </span>
                 </span>
                 <div class="multi-level collapse {% if 'database_' in segment %} show {% endif %}"
-                  role="list" id="submenu-app" aria-expanded="false">
+                  role="list" id="submenu-db" aria-expanded="false">
                   <ul class="flex-column nav">              
-                    <li class="nav-item {% if '/generic/table_io' in segment %} active {% endif %}">
+                    <li class="nav-item {% if 'database_modules' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/database_modules">
                         <span class="sidebar-text">Modules</span>
                       </a>
                     </li>
-                    <li class="nav-item {% if '/generic/table_io' in segment %} active {% endif %}">
+                    <li class="nav-item {% if 'database_settings' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/database_settings">
                         <span class="sidebar-text">All Settings</span>
                       </a>
                     </li>
-                    <li class="nav-item {% if '/generic/table_io' in segment %} active {% endif %}">
+                    <li class="nav-item {% if 'database_archive_settings' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/database_archive_settings ">
                         <span class="sidebar-text">Archive Settings</span>
                       </a>
                     </li>    
                                 
-                    <li class="nav-item {% if '/generic/table_size' in segment %} active {% endif %}">
+                    <li class="nav-item {% if 'database_activity' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/database_activity">
                         <span class="sidebar-text">Activity</span>
                       </a>
                     </li>
-                    <li class="nav-item {% if '/generic/table_size' in segment %} active {% endif %}">
+                    <li class="nav-item {% if 'database_schemas' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/database_schemas">
                         <span class="sidebar-text">Schemas</span>
                       </a>
                     </li>
-                    <li class="nav-item {% if '/generic/table_size' in segment %} active {% endif %}">
+                    <li class="nav-item {% if 'database_conflicts' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/database_conflicts">
                         <span class="sidebar-text">Conflicts</span>
                       </a>
@@ -121,10 +121,10 @@
                 </div>
               </li>
 
-              <li class="nav-item {% if 'tables' in segment %} active {% endif %}">
+              <li class="nav-item {% if 'table_' in segment %} active {% endif %}">
                 <span
                   class="nav-link  collapsed  d-flex justify-content-between align-items-center"
-                  data-bs-toggle="collapse" data-bs-target="#submenu-app">
+                  data-bs-toggle="collapse" data-bs-target="#submenu-tables">
                   <span>
                     <span class="sidebar-icon">
                       <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z" clip-rule="evenodd"></path></svg>
@@ -135,15 +135,15 @@
                     <svg class="icon icon-sm" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
                   </span>
                 </span>
-                <div class="multi-level collapse {% if 'table_' in segment %} show {% endif %}"
-                  role="list" id="submenu-app" aria-expanded="false">
+                <div class="multi-level collapse "
+                  role="list" id="submenu-tables" aria-expanded="false">
                   <ul class="flex-column nav">              
-                    <li class="nav-item {% if '/generic/table_io' in segment %} active {% endif %}">
+                    <li class="nav-item {% if 'table_io' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/table_io">
                         <span class="sidebar-text">Tables statistics</span>
                       </a>
                     </li>
-                    <li class="nav-item {% if '/generic/table_size' in segment %} active {% endif %}">
+                    <li class="nav-item {% if 'table_size' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/table_size">
                         <span class="sidebar-text">Tables size</span>
                       </a>
@@ -152,7 +152,7 @@
                   </ul>
                 </div>
               </li>
-              <li class="nav-item {% if 'page-' in segment %} active {% endif %}">
+              <li class="nav-item {% if 'index_' in segment %} active {% endif %}">
                 <span
                   class="nav-link  collapsed  d-flex justify-content-between align-items-center"
                   data-bs-toggle="collapse" data-bs-target="#submenu-pages">
@@ -169,27 +169,27 @@
                 <div class="multi-level collapse {% if 'index_' in segment %} show {% endif %} " role="list"
                   id="submenu-pages" aria-expanded="false">
                   <ul class="flex-column nav">
-                    <li class="nav-item">
+                    <li class="nav-item {% if 'index_definition' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/index_definition">
                         <span class="sidebar-text">All indexes</span>
                       </a>
                     </li>                    
-                    <li class="nav-item">
+                    <li class="nav-item {% if 'index_seqscan' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/index_seqscan">
                         <span class="sidebar-text">Sequential scans</span>
                       </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item {% if 'index_unused' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/index_unused">
                         <span class="sidebar-text">Unused indexes</span>
                       </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item {% if 'index_usage' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/index_usage">
                         <span class="sidebar-text">Indexes usage</span>
                       </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item {% if 'index_io' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/index_io">
                         <span class="sidebar-text">Indexes IO</span>
                       </a>
@@ -197,10 +197,10 @@
                   </ul>
                 </div>
               </li>
-              <li class="nav-item {% if 'components-' in segment %} active {% endif %}">
+              <li class="nav-item {% if 'issue_' in segment %} active {% endif %}">
                 <span
                   class="nav-link  collapsed  d-flex justify-content-between align-items-center"
-                  data-bs-toggle="collapse" data-bs-target="#submenu-components">
+                  data-bs-toggle="collapse" data-bs-target="#submenu-issue">
                   <span>
                     <span class="sidebar-icon">
                       <svg class="icon icon-xs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
@@ -212,24 +212,24 @@
                   </span>
                 </span>
                 <div class="multi-level collapse {% if 'issue_' in segment %} show {% endif %}" role="list"
-                  id="submenu-components" aria-expanded="false">
+                  id="submenu-issue" aria-expanded="false">
                   <ul class="flex-column nav">
-                    <li class="nav-item">
+                    <li class="nav-item {% if 'issue_no_pk' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/issue_no_pk">
                         <span class="sidebar-text">Tables without PK</span>
                       </a>
                     </li> 
-                    <li class="nav-item">
+                    <li class="nav-item {% if 'issue_idx_redundant' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/issue_idx_redundant">
                         <span class="sidebar-text">Redundant Indexes</span>
                       </a>
                     </li>    
-                    <li class="nav-item {% if 'components-notifications' in segment %} active {% endif %}">
+                    <li class="nav-item {% if 'issue_idx_duplicate' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/issue_idx_duplicate">
                         <span class="sidebar-text">Duplicate indexes</span>
                       </a>
                     </li>
-                    <li class="nav-item {% if 'components-notifications' in segment %} active {% endif %}">
+                    <li class="nav-item {% if 'issue_idx_fk_missing' in segment %} active {% endif %}">
                       <a class="nav-link" href="/generic/issue_idx_fk_missing">
                         <span class="sidebar-text">Missing indexes on foreign keys</span>
                       </a>

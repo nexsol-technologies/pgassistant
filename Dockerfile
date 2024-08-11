@@ -1,7 +1,7 @@
 
 FROM python:3.12.4-alpine3.20
 
-RUN apk update && apk upgrade && apk add postgresql-client && apk add util-linux
+RUN apk update && apk upgrade && apk add postgresql-client && apk add util-linux && apk add bash
 RUN python -m pip install --upgrade pip
 RUN pip install gunicorn
 
@@ -28,6 +28,7 @@ COPY --chown=pgassistant:pgassistant ./media /home/pgassistant/media
 COPY --chown=pgassistant:pgassistant ./gunicorn-cfg.py /home/pgassistant/gunicorn-cfg.py
 COPY --chown=pgassistant:pgassistant ./queries.json /home/pgassistant/queries.json
 COPY --chown=pgassistant:pgassistant ./render.yaml /home/pgassistant/render.yaml
+COPY --chown=pgassistant:pgassistant ./pgtune.sh /home/pgassistant/pgtune.sh 
 COPY --chown=pgassistant:pgassistant ./run.py /home/pgassistant/run.py 
 
 EXPOSE 5085

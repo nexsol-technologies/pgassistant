@@ -10,6 +10,22 @@
             "reference": "https://www.postgresql.org/docs/current/sql-show.html"
         },
         {
+            "id": "db_file_settings",
+            "description": "Database configuration file settings",
+            "category": "Database",        
+            "sql": "select name,setting from pg_file_settings;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/view-pg-file-settings.html"
+        },
+        {
+            "id": "databse_pg_tune",
+            "description": "PGTune parameters",
+            "category": "Database",
+            "sql": "select category, name, setting from pg_settings where name in ('max_connections','shared_buffers','effective_cache_size','maintenance_work_mem','checkpoint_completion_target','wal_buffers','default_statistics_target','random_page_cost','effective_io_concurrency','work_mem','huge_pages','min_wal_size','max_wal_size','max_worker_processes','max_parallel_workers_per_gather','max_parallel_workers','max_parallel_maintenance_workers') order by name",
+            "type": "select",
+            "reference": "https://pgtune.leopard.in.ua/"
+        },
+        {
             "id": "db_size",
             "description": "Database size",            
             "category": "Database",        
@@ -172,9 +188,9 @@
             "category": "Database",
             "id": "database_settings",
             "description": "Database settings",
-            "sql": "select category, name, setting from pg_settings;",
+            "sql": "SHOW ALL",
             "type": "select",
-            "reference": "https://www.postgresql.org/docs/current/view-pg-settings.html"           
+            "reference": "https://www.postgresql.org/docs/current/sql-show.html"           
         },
         {
             "category": "Database",

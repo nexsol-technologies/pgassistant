@@ -1,6 +1,10 @@
-# PgAssistant
-
-![Alt text](media/pgassistant.png?raw=true "pgAssistant")
+<p align="center">
+  <img src="media/pgassistant.png" alt="pgAssistant" height="120px"/>
+  <br>
+  <em>A PostgreSQL assistant for developers<br />
+      designed to help understand and optimize PostgreSQL database performance.</em>
+  <br>
+</p>
 
 PgAssistant is an open-source tool designed to help developers understand and optimize their PostgreSQL database performance. It provides insights into database behavior, identifies schema-related issues, and assists in correcting them. Additionally, PgAssistant makes it easy to manage a library of specific SQL queries useful for your project through a simple JSON file.
 
@@ -13,6 +17,7 @@ PgAssistant is an open-source tool designed to help developers understand and op
 - **Lint SQL Code**: Pgassistant is using Python **Sqlfluff** to lint your SQL code 
 - **OpenAI helper**: If you have an OpenAI account, the interface can query OpenAI to help you understand your query plan and optimize your SQL queries
 - **LLM helper**: If you use a different LLM than OpenAI, PgAssistant will help you correctly formulate a query to your preferred LLM engine.
+- **PGTune**: PGTune is now on board !
 
 ## Screen shots
 
@@ -92,12 +97,6 @@ Visit `http://localhost:8080/database.html` in your browser. The app should be u
 $ virtualenv env
 $ source env/bin/activate
 $ pip3 install -r requirements.txt
-$ python -m pip install psycopg2-binary
-```
-
-On Mac os add this :
-```bash
-$ python -m pip install psycopg2-binary
 ```
 
 <br />
