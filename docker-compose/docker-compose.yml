@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   pgassistant:
-    image: nexsoltech/pgassistant:1.1
+    image: nexsoltech/pgassistant:1.2
     restart: always
     environment:
       - OPENAI_API_KEY=mykey

@@ -3,7 +3,9 @@
 {% block title %} Tables {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ config.ASSETS_ROOT }}/css/dataTables.dataTables.css">
+{% endblock stylesheets %}
 
 {% block content %}
 
@@ -20,14 +22,14 @@
   <div class="card border-0 shadow mb-4">
       <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-centered table-nowrap mb-0 rounded" style="width: 600px" >
+            <table class="table table-striped" style="width:100%" id="queries" >
                 <thead class="thead-light">
                     <tr>
-                        <th class="border-0 rounded-start">Category</th>                     
-                        <th class="border-0 rounded-start">Description</th>                     
-                        <th class="border-0 rounded-start">SQL</th>
-                        <th class="border-0 rounded-start">Type</th>
-                        <th class="border-0 rounded-start">Reference</th>                        
+                        <th>Category</th>                     
+                        <th>Description</th>                     
+                        <th>SQL</th>
+                        <th>Type</th>
+                        <th>Reference</th>                        
                     </tr>                                          
                 </thead>
                 <tbody>
@@ -92,7 +94,11 @@
         </div>
       </div>
   </div>
-
+  <script id="dt1" src="{{ config.ASSETS_ROOT }}/js/jquery-3.7.1.js" ></script>
+  <script id="dt3" src="{{ config.ASSETS_ROOT }}/js/dataTables.js" ></script>
+  
+  <script>new DataTable('#queries');</script>
+  
 
 {% endblock content %}
 

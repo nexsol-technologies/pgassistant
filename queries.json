@@ -45,7 +45,7 @@
             "id": "table_size",
             "description": "All tables size",                        
             "category": "Table",        
-            "sql": "select table_name, pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size, pg_total_relation_size(quote_ident(table_name)) from information_schema.tables where table_schema  not in ('pg_catalog','information_schema') order by 3 desc;",
+            "sql": "select table_name, (SELECT n_live_tup FROM pg_stat_user_tables where relname=table_name ORDER BY n_live_tup desc limit 1) as row_count, pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size, pg_total_relation_size(quote_ident(table_name)) from information_schema.tables where table_schema  not in ('pg_catalog','information_schema') order by 4 desc;",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/9.1/functions-admin.html"
         },
@@ -53,7 +53,7 @@
             "id": "table_size_top_5",
             "description": "Top 5 tables size",                        
             "category": "Table",        
-            "sql": "select table_name, pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size, pg_total_relation_size(quote_ident(table_name)) from information_schema.tables where table_schema  not in ('pg_catalog','information_schema') order by 3 desc limit 5;",
+            "sql": "select table_name, (SELECT n_live_tup FROM pg_stat_user_tables where relname=table_name ORDER BY n_live_tup desc limit 1) as row_count, pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size, pg_total_relation_size(quote_ident(table_name)) from information_schema.tables where table_schema  not in ('pg_catalog','information_schema') order by 4 desc limit 5;",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/9.1/functions-admin.html"
         },        

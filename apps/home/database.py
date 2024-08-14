@@ -129,7 +129,7 @@ def get_db_info(db_config,con=None):
             table_size, _= db_query(con,'table_size_top_5')
             info["table_size"]=table_size
 
-            info['users'], _= db_query(con,'users')
+            #info['users'], _= db_query(con,'users')
             info['profile'], _= db_query(con,'database_profile')
 
             connexions, _= db_query(con,'database_count_connexions')

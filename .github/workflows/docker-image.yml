@@ -22,6 +22,6 @@ jobs:
         with:
           file: ./Dockerfile
           push: true
-          tags: nexsoltech/pgassistant:1.0
+          tags: nexsoltech/pgassistant:1.2
           platforms: linux/amd64,linux/arm64
           no-cache: true
