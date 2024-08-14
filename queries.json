@@ -220,7 +220,7 @@
             "category": "Database",
             "id": "database_count_conlicts",
             "description": "Database count conflicts",
-            "sql": "SELECT sum(confl_tablespace+confl_lock+confl_snapshot+confl_bufferpin+confl_deadlock+confl_active_logicalslot) as nb from pg_stat_database_conflicts;",
+            "sql": "SELECT sum(confl_tablespace+confl_lock+confl_snapshot+confl_bufferpin+confl_deadlock) as nb from pg_stat_database_conflicts;",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-DATABASE-CONFLICTS-VIEW"
         },                
