@@ -2,7 +2,7 @@
 """
 Main routes
 """
-
+import traceback
 from apps.home import blueprint
 from flask import render_template, request, session,redirect
 from flask_login import login_required, current_user
@@ -121,6 +121,7 @@ def generic(genericid):
         else:
             return redirect("/database.html")
     except Exception as e1:
+        traceback.print_exc()
         return render_template('home/page-500.html', err=e1), 500
 
 @blueprint.route('/generic_param/<genericid>', methods=['GET', 'POST'])
@@ -133,7 +134,6 @@ def generic_param(genericid):
             # extract parameters list
             pattern = r'\$[0-9]+' 
             parameters = re.findall(pattern, query['sql'])
-            print ( parameters )
 
             if request.method == 'POST':
                 for key, val in request.form.items():
@@ -146,6 +146,7 @@ def generic_param(genericid):
     except TemplateNotFound:
         return render_template('home/page-404.html'), 404
     except Exception as e1:
+        traceback.print_exc()
         return render_template('home/page-500.html', err=e1), 500
 
 @blueprint.route('/analyze/<querid>', methods=['GET', 'POST'])
@@ -162,15 +163,15 @@ def analyze_query(querid):
 
             if request.method == 'POST':
                 for key, val in request.form.items():
-                    print (key,val)
                     sql_query = sql_query.replace (key,val)
                 sql_query_analzye = 'EXPLAIN ANALYZE  ' + sql_query
                 rows = database.generic_select_with_sql(session,sql_query_analzye)
                 chatgpt = llm.get_llm_query_for_query_analyze(sql_query=sql_query_analzye, rows=rows)
-                if request.form.get('submit')=='chatgpt':
+                
+                if request.form.get('action')=='chatgpt':
                     chatgpt_response=llm.query_chatgpt(chatgpt)
                     return render_template('home/chatgpt.html', chatgpt_response=chatgpt_response)
-                elif request.form.get('submit')=='optimize':
+                elif request.form.get('action')=='optimize':
                     question_optimize=llm.get_llm_query_for_query_optimize(sql_query)
                     chatgpt_response=llm.query_chatgpt(question_optimize)
                     return render_template('home/chatgpt.html', chatgpt_response=chatgpt_response)
@@ -182,6 +183,7 @@ def analyze_query(querid):
     except TemplateNotFound:
         return render_template('home/page-404.html'), 404
     except Exception as e1:
+        traceback.print_exc()
         return render_template('home/page-500.html', err=e1), 500
 
 
@@ -214,10 +216,10 @@ def route_template(template: str):
             return handle_myqueries_get()
         
         return render_template(f"home/{template}", segment=segment, dbinfo={})
-
     except TemplateNotFound:
         return render_template('home/page-404.html'), 404
     except Exception as e:
+        traceback.print_exc()
         return render_template('home/page-500.html', err=str(e)), 500
 
 # Helper - Extract current page name from request

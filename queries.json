@@ -101,9 +101,9 @@
             "id": "index_seqscan",
             "description": "Tables with sequential scans",
             "category": "Indexe",
-            "sql": "SELECT relname, seq_scan, seq_tup_read / seq_scan AS tup_per_scan,(select query from pg_stat_statements where lower(query) like '%'||relname||'%' and query not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' order by total_exec_time desc limit 1 ) FROM pg_stat_user_tables WHERE seq_scan > 0 order by seq_scan desc limit 10;",
+            "sql": "SELECT schemaname, relname, seq_scan, seq_tup_read / seq_scan AS tup_per_scan,(select query from pg_stat_statements where lower(query) like '%'||relname||'%' and lower(query) not like '%explain analyze%' and lower(query) not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' order by total_exec_time desc limit 1 ), last_seq_scan, seq_tup_read, idx_tup_fetch, last_vacuum, last_autovacuum, last_analyze FROM pg_stat_user_tables WHERE seq_scan > 0 order by seq_scan desc limit 50;",
             "type": "select",
-            "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"
+            "reference": "https://www.postgresql.org/docs/16/monitoring-stats.html#MONITORING-PG-STAT-ALL-TABLES-VIEW"
         },
         {
             "id": "index_unused",            
@@ -117,7 +117,7 @@
             "id": "index_usage",
             "category": "Indexe",
             "description": "Indexes usage",
-            "sql": "SELECT relname, 100 * idx_scan / (seq_scan + idx_scan) percent_of_times_index_used, n_live_tup FROM pg_stat_user_tables ORDER BY n_live_tup DESC;",
+            "sql": "SELECT relname, 100 * idx_scan / (seq_scan + idx_scan) percent_of_times_index_used, n_live_tup FROM pg_stat_user_tables where seq_scan + idx_scan>0 ORDER BY n_live_tup DESC;",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ALL-TABLES-VIEW"
         },
@@ -196,7 +196,7 @@
             "category": "Database",
             "id": "database_archive_settings",
             "description": "Database archive settings",
-            "sql": "select category, name, setting from pg_settings where name like 'archive%' or name like '%wal%';;",
+            "sql": "select category, name, setting from pg_settings where lower(name) like 'archive%' or lower(name) like '%wal%';;",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/current/view-pg-settings.html"             
         },

@@ -21,7 +21,7 @@
                         
                     </button>
                 </div>
-                <form method="POST">
+                <form method="POST" id="form_connect">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <div>
@@ -62,7 +62,7 @@
                         <label for="db_info">{{ dbinfo['error'] }}</label>
                     
                     <div class="mt-3">
-                        <button class="btn btn-primary" type="submit">Connect
+                        <button id="connect" onclick="myButtonCircle(this)" class="btn btn-primary" type="submit">Connect
                             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" 
                                 d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"></path>
@@ -95,7 +95,20 @@
         </div>
 
     </div>
+    <script type="text/javascript">
 
+        
+        function myButtonCircle(el) {          
+              const form = document.getElementById("form_connect")
+              if(form.checkValidity()) {
+                document.getElementById("connect").disabled=true;
+                document.getElementById("connect").innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Connecting  ...';
+                form.submit();
+              } else {
+                    form.reportValidity()
+              }                 
+        }
+    </script>
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->

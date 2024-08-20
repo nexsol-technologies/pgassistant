@@ -10,3 +10,4 @@ services:
       - "8080:5005"
     volumes:
       - ./myqueries.json:/home/pgassistant/myqueries.json
+      

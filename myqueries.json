@@ -2,12 +2,21 @@
     "sql":
     [
             {
-                "id": "my_dbversion",
+                "id": "search a firsname",
                 "description": "Database version",
                 "category": "Database",        
-                "sql": "SHOW server_version;",
+                "sql": "select * from firstname where firstname like '$1%';",
+                "type": "select",
+                "reference": "https://www.postgresql.org/docs/current/sql-show.html"
+            },
+            {
+                "id": "gender count",
+                "description": "Database version",
+                "category": "Database",        
+                "sql": "select count(*) from firstname group by gender;",
                 "type": "select",
                 "reference": "https://www.postgresql.org/docs/current/sql-show.html"
             }
+            
     ]
 }

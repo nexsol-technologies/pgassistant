@@ -10,3 +10,7 @@ Feature : Adding pgTune (https://pgtune.leopard.in.ua/)
 ## [1.2] 2024-08-14
 Feature : using boostrap data tables.
 Feature : adding estimated rows count in dashboard
+
+## [1.2-1] 2024-08-18
+Feature : using spinners
+Bug correction : Dashboard bug when pg version < 14 (counting conflicts)

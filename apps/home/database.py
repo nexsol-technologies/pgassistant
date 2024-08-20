@@ -120,23 +120,24 @@ def get_db_info(db_config,con=None):
             size, _= db_query(con,'db_size',db_config['db_name'])
             info["size"]=size[0]['pg_size_pretty']
 
-            cache, _= db_query(con,'db_cache')
-            if cache:
+            try:
+                cache, _= db_query(con,'db_cache')
                 info["cache"]=cache[0]['ratio']
-            else:
+            except:
                 info["cache"]="???"
 
             table_size, _= db_query(con,'table_size_top_5')
             info["table_size"]=table_size
 
-            #info['users'], _= db_query(con,'users')
             info['profile'], _= db_query(con,'database_profile')
 
             connexions, _= db_query(con,'database_count_connexions')
             info['connexions']=connexions[0]['nb']
-
-            conflicts, _=  db_query(con,'database_count_conlicts')
-            info['conflicts']=conflicts[0]['nb']
+            try:
+                conflicts, _=  db_query(con,'database_count_conlicts')
+                info['conflicts']=conflicts[0]['nb']
+            except:
+                info['conflicts']="???"
         con.close()
     else:
         info["error"]=message
