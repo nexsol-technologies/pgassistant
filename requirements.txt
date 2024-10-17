@@ -17,3 +17,4 @@ blinker
 psycopg2-binary
 sqlfluff
 openai
+sql-metadata

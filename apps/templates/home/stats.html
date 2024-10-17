@@ -1,0 +1,65 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ config.ASSETS_ROOT }}/css/dataTables.dataTables.css">
+{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="py-4">
+
+      <div class="d-flex justify-content-between w-100 flex-wrap">
+          <div class="mb-3 mb-lg-0">
+              <h1 class="h4">Top 5 tables statistics</h1>
+              <p class="mb-0">Tables statistics order by average time</p>
+          </div>
+
+
+        </div>    
+  </div>
+
+<!--table statistics-->
+
+  <div class="card border-0 shadow mb-4">
+    <div class="card-body">
+      <div class="table-responsive">
+          <table class="table table-striped" style="width:100%" id="topqueries" >
+              <thead class="thead-light">
+                  <tr>
+                      {%for row in table_stats[0]: %}
+                      <th>{{ row }}</th>                     
+                      {% endfor %}
+                  </tr>
+              </thead>
+              <tbody>
+                  <!-- Item -->
+                  {%for row in table_stats: %}
+                  <tr>
+                  {%for value in row %}                        
+                        <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal">      
+                        {{ row[value] }}
+                        </td>              
+                   {% endfor %}                     
+                  </tr>
+                  {% endfor %}  
+              </tbody>
+          </table>
+      </div>
+    </div>
+  </div>
+
+<script id="dt1" src="{{ config.ASSETS_ROOT }}/js/jquery-3.7.1.js" ></script>
+<!--<script id="dt2" src="{{ config.ASSETS_ROOT }}/js/bootstrap.bundle.min.js" ></script>-->
+<script id="dt3" src="{{ config.ASSETS_ROOT }}/js/dataTables.js" ></script>
+<!--<script id="dt4" src="{{ config.ASSETS_ROOT }}/js/dataTables.bootstrap5.js" ></script>-->
+
+
+<script>new DataTable('#topqueries');</script>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

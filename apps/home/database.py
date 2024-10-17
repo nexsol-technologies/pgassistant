@@ -8,6 +8,7 @@ import os
 import collections
 from flask import g
 from . import pgtune
+from . import sqlhelper
 
 
 PGA_QUERIES={}
@@ -194,13 +195,25 @@ def get_my_queries():
         return rows
     return []
 
-def get_queries():
-    # get the standard json queries
-    global PGA_QUERIES
+def get_pga_tables():
+    return PGA_TABLES
 
+def get_queries():
+    global PGA_QUERIES
+    global PGA_TABLES
+
+    # get the standard json queries
     if not PGA_QUERIES.get('sql'):
         with open("queries.json", encoding="utf-8") as f_in:
             PGA_QUERIES=json.load(f_in)
+
+            # get tables names from each pgassistant queries
+            PGA_TABLES=[]
+            for query in PGA_QUERIES.get('sql'):
+                tables=sqlhelper.get_tables(query['sql'])
+                for table in tables:
+                    if table not in PGA_TABLES:
+                        PGA_TABLES.append(table)
 
         #get the user defined queries
         if os.path.isfile("myqueries.json"):

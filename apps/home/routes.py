@@ -12,6 +12,8 @@ from sqlfluff.core import FluffConfig
 from . import database
 from . import llm
 from . import pgtune
+from . import sqlhelper
+from . import stats
 import re
 
 
@@ -42,9 +44,64 @@ def handle_dashboard_get(segment: str):
 def handle_topqueries_get(template: str, segment: str):
     if session.get("db_name"):
         rows = database.get_top_queries(session)
-        return render_template(f"home/{template}", segment=segment, rows=rows)
+        
+        i=0
+        table_stats=[]
+        for query in rows:            
+            tables = sqlhelper.get_tables(query['query'])
+            for table  in tables:
+                stats.add_or_update_table_info(table_stats,
+                                               table, 
+                                               query['calls'], 
+                                               query['mean_exec_time'],
+                                               query['rows'],
+                                               'select'
+                                               )
+            rows[i]['tables']=tables
+            i = i + 1   
+        pga_tables=database.get_pga_tables()
+        rows_filtered=[]
+        for row in rows:
+            filtered=False
+            for table in row ['tables']:
+                if table in pga_tables:
+                    filtered=True
+            if not filtered:
+                rows_filtered.append(row)
+        
+        return render_template(f"home/{template}", segment=segment, rows=rows_filtered)
     else:
         return redirect("/database.html")
+
+def handle_topstatistics_get(template: str, segment: str):
+    if session.get("db_name"):
+        rows = database.get_top_queries(session)
+        
+        i=0
+        table_stats=[]
+        for query in rows:            
+            tables = sqlhelper.get_tables(query['query'])
+            for table  in tables:
+                stats.add_or_update_table_info(table_stats,
+                                               table, 
+                                               query['calls'], 
+                                               query['mean_exec_time'],
+                                               query['rows'],
+                                               'select'
+                                               )
+            rows[i]['tables']=tables
+            i = i + 1
+        table_stats.sort(reverse=True, key=lambda x: (x['avg_execution_time'], x['operation_type']))
+        pga_tables=database.get_pga_tables()
+        table_stats_filtered=[]
+        for table in table_stats:
+            if table['table_name'] not in pga_tables and "$" not in table['table_name']:
+                table_stats_filtered.append(table)
+        
+        return render_template(f"home/{template}", segment=segment, table_stats=table_stats_filtered)
+    else:
+        return redirect("/database.html")
+
 
 def handle_myqueries_get():
     queries=database.get_my_queries()
@@ -156,6 +213,7 @@ def analyze_query(querid):
         if session.get("db_name"):
             rows = []
             sql_query = database.get_pgstat_query_by_id(session,querid)
+            tables = sqlhelper.get_tables(sql_query)
             
             # extract parameters list
             pattern = r'\$[0-9]+' 
@@ -176,7 +234,7 @@ def analyze_query(querid):
                     chatgpt_response=llm.query_chatgpt(question_optimize)
                     return render_template('home/chatgpt.html', chatgpt_response=chatgpt_response)
 
-            return render_template('home/analyze.html', parameters=parameters, query=sql_query, rows=rows, description='Analyze query',chatgpt=chatgpt )
+            return render_template('home/analyze.html', parameters=parameters, query=sql_query, rows=rows, description='Analyze query',chatgpt=chatgpt, tables=tables )
         else:
             dbinfo= {}
             return redirect("/database.html")
@@ -202,6 +260,8 @@ def route_template(template: str):
             return handle_dashboard_get(segment)
         elif segment == "topqueries.html" and request.method == 'GET':
             return handle_topqueries_get(template, segment)
+        elif segment == "stats.html" and request.method == 'GET':
+            return handle_topstatistics_get(template, segment)
         elif segment == "reset_pg_statistics.html":
             return handle_reset_pg_statistics()
         elif segment == "enable_pg_statistics.html":
