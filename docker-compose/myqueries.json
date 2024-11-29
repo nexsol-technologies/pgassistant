@@ -10,11 +10,11 @@
                 "reference": "https://www.postgresql.org/docs/current/sql-show.html"
             },
             {
-                "id": "gender count",
-                "description": "gender count",
+                "id": "optimized query",
+                "description": "optimized query",
                 "category": "Database",        
-                "sql": "select count(*), gender from firstname group by gender;",
-                "type": "select",
+                "sql": "select * from firstname_opt where firstname_lower_accent like '$1%';",
+                "type": "param_query",
                 "reference": "https://www.postgresql.org/docs/current/sql-show.html"
             }
             
