@@ -16,10 +16,19 @@ ENV FLASK_APP=run.py
 ENV DEBUG=False
 
 WORKDIR /home/pgassistant
+
+# Create a virtual env for pgassistant user
+RUN python -m venv /home/pgassistant/venv
+# activate environment
+ENV PATH="/home/pgassistant/venv/bin:$PATH"
+
 COPY --chown=pgassistant:pgassistant requirements.txt /home/pgassistant/requirements.txt 
 
 # install python dependencies 
 RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r /home/pgassistant/requirements.txt
+
+RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r /home/pgassistant/requirements.txt
 
 COPY --chown=pgassistant:pgassistant ./env.sample /home/pgassistant/.env

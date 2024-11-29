@@ -14,3 +14,8 @@ Feature : adding estimated rows count in dashboard
 ## [1.2-1] 2024-08-18
 Feature : using spinners
 Bug correction : Dashboard bug when pg version < 14 (counting conflicts)
+
+## [1.3 2024-11-29
+Feature : use DDL to query LLM 
+Feature : mardown LLM response
+Feature : 
