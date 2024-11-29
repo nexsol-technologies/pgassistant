@@ -15,7 +15,8 @@
                     <code></code>
                 </div>
                 <br>
-                <textarea class="form-control" name="chatgpt" id="chatgpt" rows="20">{{ chatgpt_response }}</textarea>
+                <!--<textarea class="form-control" name="chatgpt" id="chatgpt" rows="20">{{ chatgpt_response }}</textarea>-->
+                {{ chatgpt_response|safe }}
             </div>        
         </div>
     </div>

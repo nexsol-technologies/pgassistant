@@ -14,6 +14,7 @@ from . import llm
 from . import pgtune
 from . import sqlhelper
 from . import stats
+from . import ddl
 import re
 
 
@@ -224,7 +225,7 @@ def analyze_query(querid):
                     sql_query = sql_query.replace (key,val)
                 sql_query_analzye = 'EXPLAIN ANALYZE  ' + sql_query
                 rows = database.generic_select_with_sql(session,sql_query_analzye)
-                chatgpt = llm.get_llm_query_for_query_analyze(sql_query=sql_query_analzye, rows=rows)
+                chatgpt = llm.get_llm_query_for_query_analyze(sql_query=sql_query_analzye, rows=rows, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
                 
                 if request.form.get('action')=='chatgpt':
                     chatgpt_response=llm.query_chatgpt(chatgpt)
@@ -233,6 +234,11 @@ def analyze_query(querid):
                     question_optimize=llm.get_llm_query_for_query_optimize(sql_query)
                     chatgpt_response=llm.query_chatgpt(question_optimize)
                     return render_template('home/chatgpt.html', chatgpt_response=chatgpt_response)
+                elif request.form.get('action')=='ddl':
+                    tables=sqlhelper.get_tables(sql_query)
+                    sql_text=ddl.generate_tables_ddl(tables=tables, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
+                    sql_text=ddl.sql_to_html(sql_text)
+                    return render_template('home/ddl.html', sql_text=sql_text, tables=tables, query=sql_query)
 
             return render_template('home/analyze.html', parameters=parameters, query=sql_query, rows=rows, description='Analyze query',chatgpt=chatgpt, tables=tables )
         else:

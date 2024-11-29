@@ -17,6 +17,7 @@ PgAssistant is an open-source tool designed to help developers understand and op
 - **Lint SQL Code**: Pgassistant is using Python **Sqlfluff** to lint your SQL code 
 - **OpenAI helper**: If you have an OpenAI account, the interface can query OpenAI to help you understand your query plan and optimize your SQL queries
 - **LLM helper**: If you use a different LLM than OpenAI, PgAssistant will help you correctly formulate a query to your preferred LLM engine.
+- **Get DDL**: get DDL of Top Queries
 - **PGTune**: PGTune is now on board !
 
 ## Screen shots

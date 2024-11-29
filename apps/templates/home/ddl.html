@@ -1,0 +1,40 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Settings {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+        <div class="row">
+            <div class="col-12 col-xl-8">
+                <div class="card card-body border-0 shadow mb-1">
+                    <h2 class="h5 mb-1">DDL relative to a query</h2>
+                </div>
+                    
+                <div>
+                    <h3 class="h5 mb-1">Query</h3>
+                </div>
+                <div>
+                    {{ query }}
+                    <br>
+                </div>
+                <div>
+                    <h3 class="h5 mb-1">Tables in query</h3>
+                </div>
+                <div>
+                    {{ tables }}
+                    <br>
+                </div>                
+                <br>
+                    
+                    {{ sql_text|safe }}
+                </div>        
+            </div>
+        </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
