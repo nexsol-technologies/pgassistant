@@ -13,8 +13,8 @@
 
       <div class="d-flex justify-content-between w-100 flex-wrap">
           <div class="mb-3 mb-lg-0">
-              <h1 class="h4">Top 5 tables statistics</h1>
-              <p class="mb-0">Tables statistics order by average time</p>
+              <h1 class="h4">Tables statistics</h1>
+              <p class="mb-0">Tables statistics ordered by average execution time</p>
           </div>
 
 
@@ -57,7 +57,11 @@
 <!--<script id="dt4" src="{{ config.ASSETS_ROOT }}/js/dataTables.bootstrap5.js" ></script>-->
 
 
-<script>new DataTable('#topqueries');</script>
+<script>
+  new DataTable('#topqueries', {
+      order: [[2, 'desc']] 
+    });
+</script>
 
 {% endblock content %}
 

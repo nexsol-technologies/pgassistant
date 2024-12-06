@@ -73,6 +73,40 @@ def handle_topqueries_get(template: str, segment: str):
         return render_template(f"home/{template}", segment=segment, rows=rows_filtered)
     else:
         return redirect("/database.html")
+    
+def handle_rank_queries_get(template: str, segment: str):
+    if session.get("db_name"):
+        rows = database.get_rank_queries(session)
+        
+        i=0
+        table_stats=[]
+        for query in rows:            
+            tables = sqlhelper.get_tables(query['query'])
+            for table  in tables:
+                stats.add_or_update_table_info(table_stats,
+                                               table, 
+                                               query['calls'], 
+                                               query['mean_exec_time'],
+                                               query['rows'],
+                                               'select'
+                                               )
+            rows[i]['tables']=tables
+            i = i + 1   
+        pga_tables=database.get_pga_tables()
+        rows_filtered=[]
+        for row in rows:
+            filtered=False
+            for table in row ['tables']:
+                if table in pga_tables:
+                    filtered=True
+            if not row ['tables']:
+                filtered=True    
+            if not filtered:
+                rows_filtered.append(row)
+        
+        return render_template(f"home/{template}", segment=segment, rows=rows_filtered)
+    else:
+        return redirect("/database.html")    
 
 def handle_topstatistics_get(template: str, segment: str):
     if session.get("db_name"):
@@ -266,6 +300,8 @@ def route_template(template: str):
             return handle_dashboard_get(segment)
         elif segment == "topqueries.html" and request.method == 'GET':
             return handle_topqueries_get(template, segment)
+        elif segment == "rankqueries.html" and request.method == 'GET':
+            return handle_rank_queries_get(template, segment)
         elif segment == "stats.html" and request.method == 'GET':
             return handle_topstatistics_get(template, segment)
         elif segment == "reset_pg_statistics.html":

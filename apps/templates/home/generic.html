@@ -81,8 +81,13 @@
 <script id="dt1" src="{{ config.ASSETS_ROOT }}/js/jquery-3.7.1.js" ></script>
 <script id="dt3" src="{{ config.ASSETS_ROOT }}/js/dataTables.js" ></script>
 
-<script>new DataTable('#generic');</script>
 
+<script>
+    // Garde les colonnes triables mais désactive le tri par défaut
+    new DataTable('#generic', {
+      order: [] // Pas de tri initial
+    });
+</script>
 
 {% endblock content %}
 

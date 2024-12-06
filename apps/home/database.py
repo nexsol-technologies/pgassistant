@@ -85,6 +85,19 @@ def get_top_queries(db_config):
     
     return rows
 
+def get_rank_queries(db_config):
+    rows = []
+    
+    con, message = connectdb(db_config)
+    if con:
+       try:
+           rows,description=db_query(con,'rank_queries')
+       except:
+           rows=[] 
+       con.close()
+    
+    return rows
+
 def exec_cmd(db_config,query_id):
     con, message = connectdb(db_config)
     if con:

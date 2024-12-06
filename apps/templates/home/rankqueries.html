@@ -13,27 +13,10 @@
 
       <div class="d-flex justify-content-between w-100 flex-wrap">
           <div class="mb-3 mb-lg-0">
-              <h1 class="h4">Top queries</h1>
-              <p class="mb-0">You need to enable pg_stat_statements module to track statistics of SQL planning and execution</p>
+              <h1 class="h4">Rank queries</h1>
+              <p class="mb-0">optimization_score_percentage is calculated with execution_time_percentage (60% weight) and cache_ratio_percentage (40% weight)</p>
           </div>
-
-
         </div>
-        <div class="btn-group">
-
-            <button onclick="location.href='/reset_pg_statistics.html'" type="button" class="btn btn-danger d-inline-flex align-items-center">
-                <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0">
-                </path></svg>
-                Reset
-            </button>
-            <button onclick="location.href='/enable_pg_statistics.html'" type="button" class="btn btn-info d-inline-flex align-items-center">
-                <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m4.5 12.75 6 6 9-13.5">
-                </path></svg>
-                Enable module
-            </button>
-          </div>        
   </div>
 
   <div class="card border-0 shadow mb-4">
@@ -65,11 +48,11 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 11.25 1.5 1.5.75-.75V8.758l2.276-.61a3 3 0 1 0-3.675-3.675l-.61 2.277H12l-.75.75 1.5 1.5M15 11.25l-8.47 8.47c-.34.34-.8.53-1.28.53s-.94.19-1.28.53l-.97.97-.75-.75.97-.97c.34-.34.53-.8.53-1.28s.19-.94.53-1.28L12.75 9M15 11.25 12.75 9">
                                 </path></svg>
                             </button>
-                            {% if row['mean_exec_time']<0.5 %}
+                            {% if row['optimization_score_percentage']|int <30 %}
                             <span class="badge bg-success">OK</span>
-                            {% elif row['mean_exec_time']<1 %}
+                            {% elif row['optimization_score_percentage']|int <40 %}
                             <span class="badge bg-secondary">OK</span>
-                            {% elif row['mean_exec_time']<5 %}
+                            {% elif row['mean_exec_time']|int <50 %}
                             <span class="badge bg-warning text-dark">Warning</span>
                             {% else %}
                             <span class="badge bg-danger">Perf</span>
@@ -103,9 +86,9 @@
 
 
 <script>
-    new DataTable('#topqueries', {
-        order: [[4, 'desc']] 
-      });
+new DataTable('#topqueries', {
+    order: [[10, 'desc']] // Tri sur la 2e colonne (index 1) en ordre décroissant
+  });
 </script>
 
 {% endblock content %}

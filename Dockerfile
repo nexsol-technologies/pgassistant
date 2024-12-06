@@ -1,5 +1,5 @@
 # Use a specific lightweight base image
-FROM python:3.12.4-alpine3.20
+FROM python:3-alpine3.20
 
 # Combine related APK commands to reduce image layers and cleanup cache
 RUN apk add --no-cache --update \

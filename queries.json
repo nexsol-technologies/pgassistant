@@ -98,6 +98,14 @@
             "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"
         },
         {
+            "id": "rank_queries",
+            "description": "Rank queries",
+            "category": "Query",  
+            "sql": "WITH ranked_queries AS (SELECT query, queryid, calls, rows, mean_exec_time, total_exec_time, (shared_blks_hit / NULLIF((shared_blks_hit + shared_blks_read), 0)::NUMERIC) * 100 AS hit_cache_ratio, calls * mean_exec_time AS weighted_execution_time, (1 - (shared_blks_hit / NULLIF((shared_blks_hit + shared_blks_read), 0)::NUMERIC)) * 100 AS weighted_hit_cache_ratio FROM pg_stat_statements WHERE query NOT LIKE '%pg_catalog%' AND LOWER(query) NOT LIKE 'copy%' AND LOWER(query) NOT LIKE 'set%' AND calls > 1), normalized_scores AS (SELECT query, queryid, calls, rows, mean_exec_time, total_exec_time, hit_cache_ratio, weighted_execution_time, weighted_hit_cache_ratio, weighted_execution_time / NULLIF(MAX(weighted_execution_time) OVER (), 0) AS normalized_execution_time, weighted_hit_cache_ratio / NULLIF(MAX(weighted_hit_cache_ratio) OVER (), 0) AS normalized_hit_cache_ratio FROM ranked_queries) SELECT query, queryid, calls, rows, mean_exec_time, hit_cache_ratio, total_exec_time, ROUND(CAST(normalized_execution_time * 60 AS NUMERIC), 2) AS execution_time_percentage, ROUND(CAST(normalized_hit_cache_ratio * 40 AS NUMERIC), 2) AS cache_ratio_percentage, ROUND(CAST((normalized_execution_time * 60 + normalized_hit_cache_ratio * 40) AS NUMERIC), 2) AS optimization_score_percentage FROM normalized_scores WHERE (normalized_execution_time IS NOT NULL AND normalized_hit_cache_ratio IS NOT NULL) ORDER BY optimization_score_percentage DESC LIMIT 50;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"
+        },
+        {
             "id": "index_seqscan",
             "description": "Tables with sequential scans",
             "category": "Indexe",
