@@ -31,6 +31,7 @@ RUN pip install --no-cache-dir -r /home/pgassistant/requirements.txt
 
 # Copy application files in a single command to reduce layers
 COPY --chown=pgassistant:pgassistant . /home/pgassistant/
+RUN rm -rf media
 
 # Expose application port
 EXPOSE 5085

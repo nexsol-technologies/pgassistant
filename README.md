@@ -11,14 +11,16 @@ PgAssistant is an open-source tool designed to help developers understand and op
 ## Features
 
 - **Database Behavior Analysis**: Understand how your PostgreSQL database is performing with detailed analysis.
-- **Schema Optimization**: Identify and correct issues related to your database schema.
-- **Query Library Management**: Easily manage a library of specific SQL queries using a JSON file.
+- **Schema Optimization**: Identify and correct [issues](media/issues.png) related to your database schema.
+- **Query Library Management**: Easily manage a library of specific SQL queries using a [JSON file](media/myqueries.png).
 - **User-Friendly Interface**: Simple and intuitive interface for ease of use.
 - **Lint SQL Code**: Pgassistant is using Python **Sqlfluff** to lint your SQL code 
 - **OpenAI helper**: If you have an OpenAI account, the interface can query OpenAI to help you understand your query plan and optimize your SQL queries
-- **LLM helper**: If you use a different LLM than OpenAI, PgAssistant will help you correctly formulate a query to your preferred LLM engine.
-- **Get DDL**: get DDL of Top Queries
-- **PGTune**: PGTune is now on board !
+- **Local LLM helper**: If you run a local LLM like [**ollama**](media/llama.png), you can use it also with pgAssistant
+- **LLM helper**: If you use a different LLM than OpenAI or ollama, PgAssistant will help you correctly formulate a query to prompt your preferred [LLM engine](media/prompt.png).
+- **Get DDL**: get DDL of Top [queries](media/ddl.png) - pgAssistant is using **pg_dump** to achieve this.
+- **PGTune**: [PGTune](media/pgtune.png) is on board. Connected to your DB, pgAssistant can help your ALTER SYSTEM parameters !
+- **Docker**: based on pgTune recommandations, pgAssistant can help you writing a [docker-compose](media/pgtune-docker.png)
 
 ## Screen shots
 
@@ -38,13 +40,9 @@ To activate this module on your database is very simple. Below, you will find an
 Not being a front-end developer, I would like to thank the team that developed Volt BootStrap 5, which is available here: https://github.com/themesberg/volt-bootstrap-5-dashboard. Thank you guys, you saved my life !
 I've used this project to develop the application' interface.
 
-## Using OpenAI with pgAssistant
+## Using LLM with pgAssistant
 
-To use OpenAI API to get advices on your query plans or to optimize a query, you must provide the environment variable **OPENAI_API_KEY** with your OpenAI API key.
-
-You can also provide the OpenAI project ID with the **OPENAI_API_PROJECT** environment variable.
-
-We did a lot of tests to find the best way to query OpenAI and help you to get the best awnser.
+Take a look at this documentation : [here](LLM.md)
 
 ## Understanding the myqueries.json file
 

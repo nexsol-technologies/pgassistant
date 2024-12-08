@@ -56,7 +56,8 @@ def generate_tables_ddl(host, port, database, user, password, tables):
             shell=True,
             check=True
         )
-        return remove_pg_catalog_lines(result.stdout)
+        ddl_s = result.stdout.replace("\n\n", "\n")
+        return remove_pg_catalog_lines(ddl_s)
     
     except subprocess.CalledProcessError as e:
         print(f"Error generating DDL: {e}")

@@ -1,9 +1,11 @@
 services:
   pgassistant:
-    image: nexsoltech/pgassistant:1.4
+    image: nexsoltech/pgassistant:1.5
     restart: always
     environment:
-      - OPENAI_API_KEY=mykey
+      - OPENAI_API_KEY = peuimportemaisobligatoire
+      - OPENAI_API_MODEL = llama3.2:latest
+      - LOCAL_LLM_URI = http://localhost:11434
     ports:
       - "8080:5005"
     volumes:

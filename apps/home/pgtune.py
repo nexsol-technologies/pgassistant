@@ -74,12 +74,17 @@ f"      - POSTGRES_DB={db_config['db_user']}\n"
                 docker_cmd = docker_cmd + f"            -c {param}='{ self.db_tune[param]}'\n"
         return docker_cmd
     
-    def get_alter_system(self,running_values):
-        sqlalter=""
+
+    def get_alter_system(self, running_values):
+        sqlalter = ""
         for param in self.db_tune: 
-            if self.db_tune[param]!=running_values[param]:
-                if is_number(self.db_tune[param]):
-                    sqlalter = sqlalter + f"ALTER SYSTEM SET {param}={self.db_tune[param]};\n"
-                else:
-                    sqlalter = sqlalter + f"ALTER SYSTEM SET {param}='{self.db_tune[param]}';\n"
+            if param in running_values:  # Check if the key exists
+                if self.db_tune[param] != running_values[param]:
+                    if is_number(self.db_tune[param]):
+                        sqlalter += f"ALTER SYSTEM SET {param}={self.db_tune[param]};\n"
+                    else:
+                        sqlalter += f"ALTER SYSTEM SET {param}='{self.db_tune[param]}';\n"
+            else:
+                print(f"Warning: Key '{param}' not found in running_values.")
         return sqlalter
+

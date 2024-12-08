@@ -961,63 +961,6 @@ a:not([href]):not([class]), a:not([href]):not([class]):hover {
   color: inherit;
   text-decoration: none; }
 
-pre,
-/* General styles for <code> */
-code {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 14px;
-  color: #2d2d2d; /* Dark gray text */
-  background-color: #f5f5f5; /* Light gray background */
-  padding: 4px 8px;
-  border-radius: 5px;
-  border: 1px solid #dcdcdc; /* Subtle border */
-  display: inline-block;
-  white-space: pre-wrap; /* Preserve formatting and wrap lines */
-  word-wrap: break-word; /* Break long lines */
-  cursor: pointer; /* Indicate that the code block can be interacted with */
-}
-
-/* For <pre> blocks containing <code> */
-pre code {
-  display: block;
-  padding: 16px;
-  border-radius: 8px;
-  overflow-x: auto; /* Enable horizontal scrolling for long lines */
-  font-size: 14px;
-}
-
-/* Styling the pre block to avoid extra margins */
-pre {
-  margin: 16px 0;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  border: 1px solid #dcdcdc;
-  overflow: hidden;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for better visibility */
-}
-
-/* Add a copy button (you can include this with JavaScript) */
-pre {
-  position: relative;
-}
-
-pre .copy-button {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background-color: #4caf50; /* Green button */
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 5px 10px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-pre .copy-button:hover {
-  background-color: #45a049; /* Slightly darker green */
-}
 kbd,
 samp {
   font-family: var(--bs-font-monospace);
@@ -1031,6 +974,20 @@ pre {
   margin-bottom: 1rem;
   overflow: auto;
   font-size: 0.875em; }
+
+  pre code {
+    font-size: inherit;
+    color: inherit;
+    word-break: normal; }
+
+code {
+  font-size: 0.875em;
+  color: #EF4683;
+  word-wrap: break-word; }
+  a > code {
+    color: inherit; }
+
+
 
 kbd {
   padding: 0.2rem 0.4rem;
