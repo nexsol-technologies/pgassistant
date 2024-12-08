@@ -3,10 +3,14 @@ services:
     image: nexsoltech/pgassistant:1.5
     restart: always
     environment:
-      - OPENAI_API_KEY = peuimportemaisobligatoire
-      - OPENAI_API_MODEL = llama3.2:latest
-      - LOCAL_LLM_URI = http://localhost:11434
+      - OPENAI_API_KEY=nothing
+      - OPENAI_API_MODEL=mistral:latest
+      - LOCAL_LLM_URI=http://host.docker.internal:11434/v1/
+      - SECRET_KEY=bertrand
     ports:
       - "8080:5005"
     volumes:
       - ./myqueries.json:/home/pgassistant/myqueries.json
+
+# tips
+# if you run ollama localy, don't forget to export this environment variable : OLLAMA_HOST=0.0.0.0:11434 and then run ollama serve

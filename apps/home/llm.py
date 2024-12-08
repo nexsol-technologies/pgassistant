@@ -14,8 +14,6 @@ def query_chatgpt(question):
     if not api_key:
         raise Exception("The environment variable OPENAI_API_KEY is not set. I can't use OpenAPI !")
 
-    # 'http://localhost:11434/v1'
-
     # Using local LLM
     if (local_llm):
         client = OpenAI(api_key=api_key, project=project,base_url = local_llm)
