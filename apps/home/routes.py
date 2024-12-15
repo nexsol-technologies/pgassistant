@@ -5,7 +5,6 @@ Main routes
 import traceback
 from apps.home import blueprint
 from flask import render_template, request, session,redirect
-from flask_login import login_required, current_user
 from jinja2 import TemplateNotFound
 import sqlfluff
 from sqlfluff.core import FluffConfig
@@ -198,6 +197,7 @@ def handle_pgtune_post():
                            sqlalter=sqlalter,
                            docker_cmd=docker_cmd
                            )
+
 
 @blueprint.route('/index')
 def index():

@@ -52,3 +52,10 @@
 
 ### Documentation
 - Add specific documentation for **LLM usage**.
+
+---
+
+## [1.5.1] - 2024-12-15
+### Features
+- Optimize LLM queries
+- Optimize gunicorn configuration.

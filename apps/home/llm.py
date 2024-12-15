@@ -22,14 +22,18 @@ def query_chatgpt(question):
         client = OpenAI(api_key=api_key, project=project)
 
     completion = client.chat.completions.create(
-    model=model_llm,
-    messages=[
-        {"role": "system", "content": "You are a Postgresql database expert"},
-        {"role": "user", "content": question }
-    ]
+        model=model_llm,
+        messages=[
+            {"role": "system", "content": "You are a Postgresql database expert"},
+            {"role": "user", "content": question }
+        ],
+        temperature=0.2,
+        max_tokens=500,
+        frequency_penalty=0.1,
+        presence_penalty=0.6,
+        n=1  
     )
-    print (markdown.markdown(completion.choices[0].message.content,
-            extensions=["fenced_code", "codehilite", "extra"]))
+
     return(markdown.markdown(completion.choices[0].message.content,extensions=["fenced_code", "codehilite", "extra"]))
 
 def get_llm_query_for_query_analyze (host, port, database, user, password, sql_query, rows):
@@ -46,7 +50,19 @@ def get_llm_query_for_query_analyze (host, port, database, user, password, sql_q
     )
     llm += "\n".join(row['QUERY PLAN'] for row in rows)
     llm += "```\n"
-    llm += "\nCould you analyze this query and suggest optimizations? If optimizations are possible, please provide the necessary SQL statements (e.g., additional indexes or query rewrites) and explain the reasoning behind your recommendations."
+    llm += (
+    "\nCould you analyze this query and suggest optimizations? If optimizations are possible, please provide the necessary SQL statements "
+    "(e.g., additional indexes or query rewrites) and explain the reasoning behind your recommendations."
+    )
+    llm += (
+    "\n\n**Important Notice:** When suggesting optimizations, especially related to indexes, please carefully review the DDL provided above. "
+    "Some indexes may already exist, and redundant or unnecessary index recommendations should be avoided. Ensure any suggested indexes align "
+    "with the schema and constraints defined in the DDL."
+    )
+    llm += (
+    "\nFeel free to reflect on possible optimizations and reasoning before finalizing your response. Ensure all suggestions are well-supported "
+    "and avoid any unnecessary or redundant recommendations."
+    )
     return llm
 
 def get_llm_query_for_query_optimize (sql_query):
