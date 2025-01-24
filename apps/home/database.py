@@ -12,6 +12,7 @@ from . import sqlhelper
 
 
 PGA_QUERIES={}
+PGA_TABLES=[]
 
 def dict_merge(dct, merge_dct):
     """ Recursive dict merge. Inspired by :meth:``dict.update()``, instead of
@@ -35,7 +36,8 @@ def connectdb(db_config):
                             user=db_config["db_user"],
                             password=db_config["db_password"],
                             port=db_config["db_port"],
-                            application_name="pgAssistant 1.0")
+                            connect_timeout=5,
+                            application_name="pgAssistant 1.6")
         con.set_session(autocommit=True)
     except psycopg2.Error as err:
         return None, format(err).rstrip()
@@ -45,6 +47,24 @@ def db_exec(conn, sql):
     conn.set_session(autocommit=True)
     cursor = conn.cursor()
     cursor.execute(sql)
+
+def db_exec_recommandation(conn, sql):
+    """
+    Execute a non-SELECT SQL clause on the given PostgreSQL connection.
+    
+    :param conn: The active psycopg2 connection object.
+    :param sql: The SQL clause to execute.
+    :return: A success message or error message.
+    """
+    try:
+        conn.set_session(autocommit=True)
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        return {"success": True, "message": f"SQL executed successfully: {sql}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+    finally:
+        cursor.close()
 
 def get_json_cursor(conn):
     return conn.cursor(cursor_factory=RealDictCursor)
@@ -216,7 +236,8 @@ def get_queries():
     global PGA_TABLES
 
     # get the standard json queries
-    if not PGA_QUERIES.get('sql'):
+    if PGA_QUERIES=={}:
+    #if not PGA_QUERIES.get('sql'):
         with open("queries.json", encoding="utf-8") as f_in:
             PGA_QUERIES=json.load(f_in)
 

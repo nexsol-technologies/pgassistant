@@ -8,7 +8,7 @@
 {% endblock stylesheets %}
 
 {% block content %}
-
+ 
   <div class="py-4">
       <div class="d-flex justify-content-between w-100 flex-wrap">
           <div class="mb-3 mb-lg-0">
@@ -26,6 +26,14 @@
           {% endif %}  
           <div>
             <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modal-default">Show query</button>
+          </div>
+          <!-- Refresh -->
+          <div>
+            <button id="refresh" type="submit" class="btn btn-info" name="submit_refresh" value="refresh" onclick="refreshPage()">
+                <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3"></path></svg>
+                    Refresh
+            </button>  
           </div>
         </div>          
       </div>
@@ -60,27 +68,71 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Item -->
-                    {%for row in rows: %}
+                    {% for row in rows: %}
                     <tr>          
-                    {%for value in row %}                    
-                        <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal">
-                            {{ row[value] }}
+                        {% for key, value in row.items() %}
+                        <td style="word-wrap: break-word; min-width: 10px; max-width: 360px; white-space: normal;">
+                            {{ value }}
+                            <!-- Afficher le bouton uniquement pour la colonne 'pga_suggestion' -->
+                            {% if key == 'pga_suggestion' and value %}
+                            <button onclick="executeSQL('{{ value }}')">Run</button>
+                            {% endif %}
                         </td>
                         {% endfor %}                     
                     </tr>
-                    {% endfor %}  
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
       </div>
   </div>
 
-
+  <p id="current-sql">No SQL executing</p>
+  <div id="results"></div>
 
 <script id="dt1" src="{{ config.ASSETS_ROOT }}/js/jquery-3.7.1.js" ></script>
 <script id="dt3" src="{{ config.ASSETS_ROOT }}/js/dataTables.js" ></script>
 
+<script>
+    function refreshPage() {
+            location.reload(); // Reloads the page
+        }
+
+    async function executeSQL(sql) {
+    // Afficher la clause SQL en cours d'exécution
+    document.getElementById("current-sql").textContent = `Executing: ${sql}`;
+    document.getElementById("results").innerHTML = "Running...";
+
+    try {
+        // Envoyer une requête POST à l'API Flask
+        const response = await fetch("/execute", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ sql })
+        });
+
+        // Vérifier si la réponse HTTP est valide
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Récupérer la réponse JSON
+        const result = await response.json();
+
+        // Afficher le résultat ou l'erreur
+        if (result.success) {
+            document.getElementById("results").innerHTML = `<strong>Success:</strong> ${result.message}`;
+        } else {
+            document.getElementById("results").innerHTML = `<strong>Error:</strong> ${result.error}`;
+        }
+    } catch (error) {
+        // Gérer les erreurs réseau ou JavaScript
+        document.getElementById("results").innerHTML = `<strong>Error:</strong> ${error.message}`;
+    }
+}
+</script>
 
 <script>
     // Garde les colonnes triables mais désactive le tri par défaut

@@ -59,3 +59,11 @@
 ### Features
 - Optimize LLM queries
 - Optimize gunicorn configuration.
+
+---
+
+## [1.6] - 2025-01-24
+### Features
+- Run Pg Assistant recommandations on database
+### Bug Fixes
+- Missing indexes on FK.

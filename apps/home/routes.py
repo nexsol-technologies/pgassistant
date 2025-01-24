@@ -4,7 +4,7 @@ Main routes
 """
 import traceback
 from apps.home import blueprint
-from flask import render_template, request, session,redirect
+from flask import render_template, request, session,redirect, jsonify
 from jinja2 import TemplateNotFound
 import sqlfluff
 from sqlfluff.core import FluffConfig
@@ -284,6 +284,22 @@ def analyze_query(querid):
         traceback.print_exc()
         return render_template('home/page-500.html', err=e1), 500
 
+@blueprint.route("/execute", methods=["POST"])
+def execute_sql():
+    try:
+        sql = request.json.get("sql")
+        if not sql:
+            return jsonify({"error": "No SQL clause provided", "success": False})
+        
+        con, _ = database.connectdb(session)
+        # Exécuter la clause SQL et retourner les résultats
+        result = database.db_exec_recommandation(con,sql)
+
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        con.close()
 
 @blueprint.route('/<template>', methods=['GET', 'POST'])
 def route_template(template: str):

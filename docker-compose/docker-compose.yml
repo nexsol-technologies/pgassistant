@@ -1,10 +1,10 @@
 services:
   pgassistant:
-    image: nexsoltech/pgassistant:1.5
+    image: nexsoltech/pgassistant:1.6
     restart: always
     environment:
       - OPENAI_API_KEY=nothing
-      - OPENAI_API_MODEL=mistral:latest
+      - OPENAI_API_MODEL=codestral:latest
       - LOCAL_LLM_URI=http://host.docker.internal:11434/v1/
       - SECRET_KEY=bertrand
     ports:
@@ -13,4 +13,5 @@ services:
       - ./myqueries.json:/home/pgassistant/myqueries.json
 
 # tips
+# with ollama, you should test the codestral model giving good results
 # if you run ollama localy, don't forget to export this environment variable : OLLAMA_HOST=0.0.0.0:11434 and then run ollama serve

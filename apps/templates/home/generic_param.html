@@ -1,14 +1,16 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Settings {% endblock %} 
+{% block title %} Tables {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ config.ASSETS_ROOT }}/css/dataTables.dataTables.css">
+{% endblock stylesheets %}
 
 {% block content %}
 
-        <div class="row">
-        <div class="col-12 col-xl-8">
+    <div class="py-4">
+        <div class="d-flex justify-content-between w-100 flex-wrap">
             <div class="card card-body border-0 shadow mb-1">
                 <h2 class="h5 mb-1">Query with parameters / {{ description }}</h2>
                 <div>
@@ -32,14 +34,16 @@
                     </div>                               
                 </form>
             </div>
+        </div>
+        <div class="d-flex justify-content-between w-100 flex-wrap">    
             <div class="card border-0 shadow mb-4">
                 <div class="card-body">
                   <div class="table-responsive">
-                      <table class="table table-centered table-nowrap mb-0 rounded" style="width: 600px" >
+                      <table id="generic" class="table table-striped" style="width:100%" >
                           <thead class="thead-light">
                               <tr>
                                   {%for row in rows[0]: %}
-                                  <th class="border-0 rounded-start">{{ row }}</th>                     
+                                  <th>{{ row }}</th>                     
                                   {% endfor %}
                               </tr>
                           </thead>
@@ -58,11 +62,23 @@
                       </table>
                   </div>
                 </div>
-            </div>        
-        </div>
-    </div>
-
-{% endblock content %}
-
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+            </div>
+        </div>  
+    </div>      
+          
+          <script id="dt1" src="{{ config.ASSETS_ROOT }}/js/jquery-3.7.1.js" ></script>
+          <script id="dt3" src="{{ config.ASSETS_ROOT }}/js/dataTables.js" ></script>
+          
+          
+          <script>
+              // Garde les colonnes triables mais désactive le tri par défaut
+              new DataTable('#generic', {
+                order: [] // Pas de tri initial
+              });
+          </script>
+          
+          {% endblock content %}
+          
+          <!-- Specific Page JS goes HERE  -->
+          {% block javascripts %}{% endblock javascripts %}
+          
