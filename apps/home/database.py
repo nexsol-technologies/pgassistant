@@ -37,7 +37,7 @@ def connectdb(db_config):
                             password=db_config["db_password"],
                             port=db_config["db_port"],
                             connect_timeout=5,
-                            application_name="pgAssistant 1.6")
+                            application_name="pgAssistant 1.7")
         con.set_session(autocommit=True)
     except psycopg2.Error as err:
         return None, format(err).rstrip()

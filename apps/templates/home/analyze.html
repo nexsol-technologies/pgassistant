@@ -12,18 +12,47 @@
             <div class="card card-body border-0 shadow mb-1">
                 <h2 class="h5 mb-1">{{ description }}</h2>
                 <div>
-                    <code>{{ query }}</code>
+                    <!-- <code>{{ query }}</code>-->
+                    <pre style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; border: 1px solid #ddd; font-family: monospace;">{{ query }}</pre>
                 </div>
                 <br>
                 <form method="POST" id="form_analyse">
                     <input class="form-control" value="" id="action" name="action" type="hidden" >
-                    {%for param in parameters: %}
+
+                    {% for param in parameters %}
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <div>
-                                <label for="param">Parameter {{ param }}</label>
-                                <input class="form-control" value="" id="{{ param }}" name="{{ param }}" type="text" placeholder="Enter parameter value" required>
+                            <label for="param">Parameter {{ param }}</label>
+                            <div class="position-relative">
+                                <input 
+                                    class="form-control suggestion-field" 
+                                    value="" 
+                                    id="{{ param }}" 
+                                    name="{{ param }}" 
+                                    type="text" 
+                                    placeholder="Enter parameter value"
+                                    autocomplete="off"
+                                    data-table="{{ genius_parameters[param][0] if param in genius_parameters else '' }}"
+                                    data-column="{{ genius_parameters[param][1] if param in genius_parameters else '' }}"
+                                    data-type="{{ genius_parameters[param][2] if param in genius_parameters else '' }}"
+                                    
+                                >
+                                <div class="suggestions-box" id="suggestions-{{ param }}" style="display: none; position: absolute; z-index: 10; background: #fff; border: 1px solid #ccc; width: 100%;">
+                                    <!-- Suggestions will be dynamically inserted here -->
+                                </div>
                             </div>
+                        </div>
+                        <!-- genius_parameters -->
+                        <div class="col-md-6 mb-3">
+                            {% if param in genius_parameters %}
+                            <div class="alert alert-info">
+                                <p>Potential match for parameter</p>
+                                Table: <strong>{{ genius_parameters[param][0] }}</strong>, 
+                                Column: <strong>{{ genius_parameters[param][1] }}</strong>, 
+                                Type: <strong>{{ genius_parameters[param][2] }}</strong>
+                            </div>
+                            <!-- Button to fetch value -->
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
@@ -137,6 +166,78 @@
     </div>
 
     <script>
+document.addEventListener('DOMContentLoaded', function () {
+    console.log("JavaScript loaded and ready to handle events.");
+
+    const suggestionFields = document.querySelectorAll('.suggestion-field');
+
+    suggestionFields.forEach(field => {
+        field.addEventListener('input', function () {
+            const table = field.getAttribute('data-table');
+            const column = field.getAttribute('data-column');
+            const type = field.getAttribute('data-type');
+            const suggestionsBox = document.getElementById(`suggestions-${field.id}`);
+
+            console.log(`Input detected on field: ${field.id}. Table: ${table}, Column: ${column}, Type: ${type}`);
+
+            if (table && column && type) {
+                fetch('/api/v1/fetch_column_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        table,
+                        column,
+                        data_type: type
+                    })
+                }).then(response => {
+                    console.log("Fetch executed. Response status:", response.status);
+                    return response.json();
+                }).then(data => {
+                    console.log("Fetch succeeded. Data received:", data);
+
+                    if (data.data && data.data.length > 0) {
+                        suggestionsBox.style.display = 'block';
+                        suggestionsBox.innerHTML = data.data
+                            .map(item => `<div class="suggestion-item" style="padding: 5px; cursor: pointer;">${item}</div>`)
+                            .join('');
+
+                        suggestionsBox.querySelectorAll('.suggestion-item').forEach(item => {
+                            item.addEventListener('click', function () {
+                                // Check the type and add quotes if needed
+                                const value = this.textContent;
+                                if (['character varying', 'text', 'date', 'timestamp'].includes(type)) {
+                                    field.value = `'${value}'`; // Wrap in single quotes
+                                } else {
+                                    field.value = value; // Use as-is for other types
+                                }
+                                suggestionsBox.style.display = 'none';
+                            });
+                        });
+                    } else {
+                        suggestionsBox.style.display = 'none';
+                    }
+                }).catch(error => {
+                    console.error("Fetch failed. Error:", error);
+                });
+            } else {
+                console.warn("Field attributes (table, column, type) are missing.");
+            }
+        });
+
+        field.addEventListener('blur', function () {
+            setTimeout(() => {
+                const suggestionsBox = document.getElementById(`suggestions-${field.id}`);
+                if (suggestionsBox) {
+                    suggestionsBox.style.display = 'none';
+                }
+            }, 200); // Delay to allow click on suggestions
+        });
+    });
+});
+
+        
         function copy() {
             let textarea = document.getElementById("chatgpt");
             textarea.select();
@@ -147,6 +248,8 @@
               if(form.checkValidity()) {
                 document.getElementById("analyze").disabled=true;
                 document.getElementById("analyze").innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Analyzing  ...';
+                but = document.getElementById("action")
+                but.setAttribute('value','analyze')
                 form.submit();
               } else {
                     form.reportValidity()

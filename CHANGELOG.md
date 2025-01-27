@@ -67,3 +67,13 @@
 - Run Pg Assistant recommandations on database
 ### Bug Fixes
 - Missing indexes on FK.
+
+## [1.7] - 2025-01-26
+### Features
+- On analyze query, try to identify data type of a parameter. Try to get 10 values of this parameter to help the user provide parameters
+- Use sql-formatter to format SQL
+- Adding an issue query : find foreign keys with wrong data type
+- Adding autovacuum=on to docker-compose parameter
+### Bug Fixes
+- When a query has more than 9 parameters, parameter replacement fails.
+

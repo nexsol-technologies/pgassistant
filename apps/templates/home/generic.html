@@ -132,6 +132,40 @@
         document.getElementById("results").innerHTML = `<strong>Error:</strong> ${error.message}`;
     }
 }
+
+function executeSQL2(sql) {
+    // Afficher la clause SQL en cours d'exécution
+    document.getElementById("current-sql").textContent = `Executing: ${sql}`;
+    document.getElementById("results").innerHTML = "Running...";
+
+    // Envoyer une requête POST à l'API Flask
+    fetch("/execute", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ sql })
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        return response.json();
+    })
+    .then((result) => {
+        // Afficher le résultat ou l'erreur
+        if (result.success) {
+            document.getElementById("results").innerHTML = `<strong>Success:</strong> ${result.message}`;
+        } else {
+            document.getElementById("results").innerHTML = `<strong>Error:</strong> ${result.error}`;
+        }
+    })
+    .error((err) => {
+        // Gérer les erreurs réseau ou JavaScript
+        document.getElementById("results").innerHTML = `<strong>Error:</strong> ${error.message}`;
+    }); 
+}
 </script>
 
 <script>

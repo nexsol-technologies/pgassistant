@@ -1,3 +1,4 @@
+ALTER_VACUUM_ON="SET autovacuum TO 'on';"
 VACUUM_OPTIMIZED="""
 DO $$
 DECLARE

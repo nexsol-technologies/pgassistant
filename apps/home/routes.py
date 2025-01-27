@@ -49,6 +49,7 @@ def handle_topqueries_get(template: str, segment: str):
         table_stats=[]
         for query in rows:            
             tables = sqlhelper.get_tables(query['query'])
+            
             for table  in tables:
                 stats.add_or_update_table_info(table_stats,
                                                table, 
@@ -153,22 +154,9 @@ def handle_enable_pg_statistics():
 
 def handle_lint_post():
     original_sql = request.form.get('sqlo')
-    config = FluffConfig(
-    overrides={
-        "dialect": "postgres",
-        # NOTE: We explicitly set the string "none" here rather
-        # than a None literal so that it overrides any config
-        # set by any config files in the path.
-        "library_path": "none",
-        "capitalisation_policy": "upper"
-    }
-)
-    linted_sql = sqlfluff.fix(original_sql, 
-                              #dialect='postgres', 
-                              fix_even_unparsable=True,
-                              config=config)
+    
     return render_template("home/lint.html", segment="lint.html",
-                           sqlo=original_sql, linted=linted_sql)
+                           sqlo=original_sql, linted=sqlhelper.format_sql(original_sql))
 
 def handle_search_post():
     searchkey = request.form.get('searchkey')
@@ -245,9 +233,12 @@ def generic_param(genericid):
 def analyze_query(querid):
     try:
         chatgpt = ""
+        genius_parameters = {}
         if session.get("db_name"):
             rows = []
             sql_query = database.get_pgstat_query_by_id(session,querid)
+            # format SQL
+            sql_query = sqlhelper.get_formated_sql(sql_query)
             tables = sqlhelper.get_tables(sql_query)
             
             # extract parameters list
@@ -255,15 +246,29 @@ def analyze_query(querid):
             parameters = re.findall(pattern, sql_query)
 
             if request.method == 'POST':
+
+                params = {}
                 for key, val in request.form.items():
-                    sql_query = sql_query.replace (key,val)
+                # Verify parameters ($1, $2, ...)
+                    if key.startswith('$'):
+                        param_index = int(key[1:])  # Convert '$1' to 1
+                        if val is None or val.strip()=='':
+                            val='NULL'
+                        params[param_index] = val  # Add to dictionnary
+
+                sql_query=sqlhelper.replace_query_parameters(sql_query,params)
                 sql_query_analzye = 'EXPLAIN ANALYZE  ' + sql_query
-                rows = database.generic_select_with_sql(session,sql_query_analzye)
-                chatgpt = llm.get_llm_query_for_query_analyze(sql_query=sql_query_analzye, rows=rows, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
-                
+
                 if request.form.get('action')=='chatgpt':
+                    rows = database.generic_select_with_sql(session,sql_query_analzye)
+                    chatgpt = llm.get_llm_query_for_query_analyze(sql_query=sql_query_analzye, rows=rows, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
+
                     chatgpt_response=llm.query_chatgpt(chatgpt)
                     return render_template('home/chatgpt.html', chatgpt_response=chatgpt_response)
+                elif request.form.get('action')=='analyze':                   
+                    parameters = {}
+                    rows = database.generic_select_with_sql(session,sql_query_analzye)
+                    chatgpt = llm.get_llm_query_for_query_analyze(sql_query=sql_query_analzye, rows=rows, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
                 elif request.form.get('action')=='optimize':
                     question_optimize=llm.get_llm_query_for_query_optimize(sql_query)
                     chatgpt_response=llm.query_chatgpt(question_optimize)
@@ -273,8 +278,11 @@ def analyze_query(querid):
                     sql_text=ddl.generate_tables_ddl(tables=tables, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
                     sql_text=ddl.sql_to_html(sql_text)
                     return render_template('home/ddl.html', sql_text=sql_text, tables=tables, query=sql_query)
+            else:
+                # try to extract parameter datatype from query
+                genius_parameters=sqlhelper.get_genius_parameters(sql_query,session)
 
-            return render_template('home/analyze.html', parameters=parameters, query=sql_query, rows=rows, description='Analyze query',chatgpt=chatgpt, tables=tables )
+            return render_template('home/analyze.html', parameters=parameters, query=sql_query, rows=rows, description='Analyze query',chatgpt=chatgpt, tables=tables, genius_parameters=genius_parameters )
         else:
             dbinfo= {}
             return redirect("/database.html")
@@ -292,14 +300,39 @@ def execute_sql():
             return jsonify({"error": "No SQL clause provided", "success": False})
         
         con, _ = database.connectdb(session)
-        # Exécuter la clause SQL et retourner les résultats
         result = database.db_exec_recommandation(con,sql)
 
         return jsonify(result)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
     finally:
-        con.close()
+        con.close()   
+
+@blueprint.route('/api/v1/fetch_column_data', methods=['POST'])
+def fetch_column_data_route():
+    """
+    Flask route to fetch data from a column in a table.
+    Expects a JSON payload with 'table', 'column', and 'data_type'.
+    """
+    try:
+        # Parse the request payload
+        payload = request.json
+        table = payload.get('table')
+        column = payload.get('column')
+        data_type = payload.get('data_type')
+
+        if not table or not column or not data_type:
+            return jsonify({"error": "Missing required parameters (table, column, data_type)."}), 400
+
+        # Call the fetch_column_data function
+        result = sqlhelper.fetch_column_data(table, column, data_type, session)
+
+        # Return the result as JSON
+        return jsonify({"data": result})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @blueprint.route('/<template>', methods=['GET', 'POST'])
 def route_template(template: str):

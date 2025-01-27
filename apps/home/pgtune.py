@@ -66,7 +66,7 @@ f"      - POSTGRES_USER={db_config['db_user']}\n"
 "      - POSTGRES_PASSWORD=xxxxx\n"
 f"      - POSTGRES_DB={db_config['db_user']}\n"            
         )
-        docker_cmd=docker_cmd+"    command: >\n        postgres\n            -c shared_preload_libraries='pg_stat_statements'\n"
+        docker_cmd=docker_cmd+"    command: >\n        postgres\n            -c shared_preload_libraries='pg_stat_statements'\n            -c autovacuum=on\n"
         for param in  self.db_tune:
             if is_number( self.db_tune[param]):
                 docker_cmd = docker_cmd + f"            -c {param}={ self.db_tune[param]}\n"
