@@ -1,0 +1,30 @@
+name: Feature request
+description: File feature request.
+title: "[Feature]: "
+labels: ["feature", "triage"]
+projects: ["nexsol-technologies/7"]
+assignees:
+  - beh74
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: feature-desc
+    attributes:
+      label: Feature
+      description: Feature description
+      placeholder: could you add this feature ?  
+      value: "."
+    validations:
+      required: true
+

@@ -144,7 +144,10 @@ def map_query_parameters(query, connection):
         A dictionary { parameter: (table, column, data_type) }.
     """
     # Use sql_metadata to parse the query
-    parser = Parser(query)
+    try:
+        parser = Parser(query)
+    except:
+        return {}
 
     # Extract tables and columns from the query
     tables = parser.tables  # List of tables in the query
