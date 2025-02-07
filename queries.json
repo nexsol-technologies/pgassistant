@@ -100,7 +100,7 @@
             "id": "top_queries",
             "description": "Top 50 queries",
             "category": "Query",  
-            "sql": "select query, calls, rows, total_exec_time,mean_exec_time,min_exec_time,max_exec_time,stddev_exec_time,shared_blks_hit/(shared_blks_hit+shared_blks_read)::NUMERIC*100 hit_cache_ratio,shared_blks_hit,shared_blks_read,shared_blks_written,shared_blks_dirtied,local_blks_hit,local_blks_read,local_blks_dirtied,temp_blks_read,temp_blks_written,blk_read_time,blk_write_time,wal_records,wal_fpi,wal_bytes,queryid from pg_stat_statements where shared_blks_hit > 0 and query not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' order by total_exec_time desc limit 50",
+            "sql": "select query, calls, rows, total_exec_time,mean_exec_time,min_exec_time,max_exec_time,stddev_exec_time,shared_blks_hit/(shared_blks_hit+shared_blks_read)::NUMERIC*100 hit_cache_ratio,shared_blks_hit,shared_blks_read,shared_blks_written,shared_blks_dirtied,local_blks_hit,local_blks_read,local_blks_dirtied,temp_blks_read,temp_blks_written,wal_records,wal_fpi,wal_bytes,queryid from pg_stat_statements where shared_blks_hit > 0 and query not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' order by total_exec_time desc limit 50",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"
         },
@@ -300,7 +300,7 @@
             "id": "top_queries_on_object",
             "description": "Top 50 queries on object",
             "category": "Query",  
-            "sql": "select queryid, query, calls, rows, total_exec_time,mean_exec_time,min_exec_time,max_exec_time,stddev_exec_time,shared_blks_hit,shared_blks_read,shared_blks_written,shared_blks_dirtied,local_blks_hit,local_blks_read,local_blks_dirtied,temp_blks_read,temp_blks_written,blk_read_time,blk_write_time,wal_records,wal_fpi,wal_bytes   from pg_stat_statements where query not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' and lower (query) like '%$1%' order by total_exec_time desc limit 50",
+            "sql": "select queryid, query, calls, rows, total_exec_time,mean_exec_time,min_exec_time,max_exec_time,stddev_exec_time,shared_blks_hit,shared_blks_read,shared_blks_written,shared_blks_dirtied,local_blks_hit,local_blks_read,local_blks_dirtied,temp_blks_read,temp_blks_written,wal_records,wal_fpi,wal_bytes   from pg_stat_statements where query not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' and lower (query) like '%$1%' order by total_exec_time desc limit 50",
             "type": "param_query",
             "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"
         },
@@ -316,7 +316,7 @@
             "id": "database_profile",
             "description": "DB Profile : amount of select, insert, update or delete",
             "category": "Query",  
-            "sql": "WITH query_stats AS ( SELECT CASE WHEN lower(query) LIKE '%select%' THEN 'select' WHEN lower(query) LIKE '%insert%' THEN 'insert' WHEN lower(query) LIKE '%update%' THEN 'update' WHEN lower(query) LIKE '%delete%' THEN 'delete' END AS query_type, SUM(calls) AS total_calls, SUM(rows) AS total_rows, SUM(total_exec_time) AS total_exec_time, AVG(mean_exec_time) AS avg_mean_exec_time FROM pg_stat_statements WHERE lower(query) LIKE '%select%' OR lower(query) LIKE '%insert%' OR lower(query) LIKE '%update%' OR lower(query) LIKE '%delete%' GROUP BY query_type ), total_stats AS ( SELECT SUM(total_calls) AS grand_total_calls, SUM(total_exec_time) AS grand_total_exec_time FROM query_stats ) SELECT qs.query_type, qs.total_calls, qs.total_rows, round(qs.total_exec_time::numeric,2) as total_exec_time, round(qs.avg_mean_exec_time::numeric,3) as avg_mean_exec_time, round((qs.total_calls / ts.grand_total_calls) * 100,0) AS percentage_calls, round((qs.total_exec_time / ts.grand_total_exec_time)::numeric * 100,0) AS percentage_exec_time FROM query_stats qs, total_stats ts;",
+            "sql": "WITH query_stats AS ( SELECT CASE WHEN lower(query) LIKE '%select %' THEN 'select' WHEN lower(query) LIKE '%insert %' THEN 'insert' WHEN lower(query) LIKE '%update %' THEN 'update' WHEN lower(query) LIKE '%delete %' THEN 'delete' END AS query_type, SUM(calls) AS total_calls, SUM(rows) AS total_rows, SUM(total_exec_time) AS total_exec_time, AVG(mean_exec_time) AS avg_mean_exec_time FROM pg_stat_statements WHERE lower(query) LIKE '%select %' OR lower(query) LIKE '%insert %' OR lower(query) LIKE '%update %' OR lower(query) LIKE '%delete %' GROUP BY query_type ), total_stats AS ( SELECT SUM(total_calls) AS grand_total_calls, SUM(total_exec_time) AS grand_total_exec_time FROM query_stats ) SELECT qs.query_type, qs.total_calls, qs.total_rows, round(qs.total_exec_time::numeric,2) as total_exec_time, round(qs.avg_mean_exec_time::numeric,3) as avg_mean_exec_time, round((qs.total_calls / ts.grand_total_calls) * 100,0) AS percentage_calls, round((qs.total_exec_time / ts.grand_total_exec_time)::numeric * 100,0) AS percentage_exec_time FROM query_stats qs, total_stats ts;",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"            
         }                     

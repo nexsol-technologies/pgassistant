@@ -11,7 +11,21 @@ def get_tables(query):
         return tables
     except:
         return []
+
+def get_sql_type(sql_query):
+    """
+    which query type  : SELECT, INSERT, UPDATE, DELETE, etc.
     
+    :param sql_query: the SQL query.
+    :return: query type (str).
+    """
+    try:
+        parser = Parser(sql_query)
+        sqltype = parser.query_type.replace ('QueryType.', '')
+        return sqltype.lower()
+    except:
+        return "unknown"
+
 def get_formated_sql(sql_query):
     try:
         sqlf = format_sql(sql_query)
@@ -153,6 +167,9 @@ def map_query_parameters(query, connection):
     tables = parser.tables  # List of tables in the query
     columns_dict = parser.columns_dict  # Dictionary of columns by context
 
+    if columns_dict is None:
+        return {}
+
     # Extract parameters like $1, $2, etc.
     parameters = sorted(set(re.findall(r"\$\d+", query)))
 
@@ -223,4 +240,42 @@ def get_genius_parameters (sql_query, session):
         return parameter_mapping
     return None
 
+def analyze_explain_row(row):
+    """
+    Generates a comment based on the content of an EXPLAIN ANALYZE row.
+    The input row is a dictionary with a 'QUERY PLAN' key.
+    """
+    query_plan = row.get('QUERY PLAN', '')
 
+    if 'Seq Scan' in query_plan:
+        return "⚠️ Sequential scan detected. Consider adding an index."
+    elif 'Bitmap Heap Scan' in query_plan:
+        return "🟡 Bitmap heap scan used. Consider an index scan if performance is slow."
+    elif 'Bitmap Index Scan' in query_plan:
+        return "🟡 Bitmap index scan used. Works well if not scanning too many pages."    
+    elif 'Index Scan' in query_plan:
+        return "✅ Efficient index scan detected."
+    elif 'Index Only Scan' in query_plan:
+        return "🚀 Very efficient index-only scan. No need to access the table directly."
+    elif 'Nested Loop' in query_plan:
+        return "⚠️ Nested loop detected. Ensure indexes exist on join conditions."
+    elif 'Hash Join' in query_plan:
+        return "🟢 Hash join used. Efficient for large datasets."
+    elif 'Merge Join' in query_plan:
+        return "🟡 Merge join detected. Ensure both tables are sorted for efficiency."
+    elif 'Sort' in query_plan:
+        return "⚠️ Sorting operation detected. Increase work_mem if sorting large datasets."
+    elif 'HashAggregate' in query_plan:
+        return "⚠️ Hash aggregate used. May be slow if memory is insufficient."
+    elif 'Materialize' in query_plan:
+        return "🟡 Materialize used. Can increase memory usage."
+    elif 'CTE Scan' in query_plan:
+        return "⚠️ Common Table Expression (CTE) Scan. Consider inlining if performance is slow."
+    elif 'Gather' in query_plan:
+        return "🔄 Parallel execution detected. Improves performance on large datasets."
+    elif 'Disk Spill' in query_plan:
+        return "❌ Disk spill detected. Increase work_mem to avoid slow disk operations."
+    elif 'External Merge Disk' in query_plan:
+        return "❌ External disk merge detected. PostgreSQL is using disk instead of memory."
+    else:
+        return ""

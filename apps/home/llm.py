@@ -39,7 +39,7 @@ def query_chatgpt(question):
 def get_llm_query_for_query_analyze (host, port, database, user, password, sql_query, rows):
     query = sql_query.replace ("EXPLAIN ANALYZE  ", "")
     tables = get_tables(query)
-    print (sql_query, tables)
+    
     ddl = generate_tables_ddl(host, port, database, user, password, tables)
 
     llm = (

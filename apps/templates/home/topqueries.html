@@ -60,11 +60,13 @@
                         
                         {% if 'EXPLAIN ANALYZE' not in row[value] %}
                         <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal">
+                            {% if row['operation_type'] in ['select', 'update', 'delete'] %}
                             <button onclick="location.href='/analyze/{{ row['queryid'] }}'" type="button" class="btn btn-info d-inline-flex align-items-center">
                                 <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 11.25 1.5 1.5.75-.75V8.758l2.276-.61a3 3 0 1 0-3.675-3.675l-.61 2.277H12l-.75.75 1.5 1.5M15 11.25l-8.47 8.47c-.34.34-.8.53-1.28.53s-.94.19-1.28.53l-.97.97-.75-.75.97-.97c.34-.34.53-.8.53-1.28s.19-.94.53-1.28L12.75 9M15 11.25 12.75 9">
                                 </path></svg>
                             </button>
+                            {% endif %}
                             {% if row['mean_exec_time']<0.5 %}
                             <span class="badge bg-success">OK</span>
                             {% elif row['mean_exec_time']<1 %}

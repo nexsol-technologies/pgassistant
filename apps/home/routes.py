@@ -14,6 +14,7 @@ from . import pgtune
 from . import sqlhelper
 from . import stats
 from . import ddl
+from . import sqlcolumns
 import re
 
 
@@ -48,17 +49,9 @@ def handle_topqueries_get(template: str, segment: str):
         i=0
         table_stats=[]
         for query in rows:            
-            tables = sqlhelper.get_tables(query['query'])
-            
-            for table  in tables:
-                stats.add_or_update_table_info(table_stats,
-                                               table, 
-                                               query['calls'], 
-                                               query['mean_exec_time'],
-                                               query['rows'],
-                                               'select'
-                                               )
+            tables = sqlhelper.get_tables(query['query'])            
             rows[i]['tables']=tables
+            rows[i]['operation_type']=sqlhelper.get_sql_type(query['query'])
             i = i + 1   
         pga_tables=database.get_pga_tables()
         rows_filtered=[]
@@ -88,7 +81,8 @@ def handle_rank_queries_get(template: str, segment: str):
                                                query['calls'], 
                                                query['mean_exec_time'],
                                                query['rows'],
-                                               'select'
+                                               'select',
+                                               []
                                                )
             rows[i]['tables']=tables
             i = i + 1   
@@ -117,12 +111,20 @@ def handle_topstatistics_get(template: str, segment: str):
         for query in rows:            
             tables = sqlhelper.get_tables(query['query'])
             for table  in tables:
+                columns = []
+                
+                try:
+                    columns = sqlcolumns.extract_where_columns(query['query'], table)
+                except:
+                    columns = []
+                
                 stats.add_or_update_table_info(table_stats,
                                                table, 
                                                query['calls'], 
                                                query['mean_exec_time'],
                                                query['rows'],
-                                               'select'
+                                               sqlhelper.get_sql_type(query['query']),
+                                               columns
                                                )
             rows[i]['tables']=tables
             i = i + 1
@@ -257,18 +259,18 @@ def analyze_query(querid):
                         params[param_index] = val  # Add to dictionnary
 
                 sql_query=sqlhelper.replace_query_parameters(sql_query,params)
-                sql_query_analzye = 'EXPLAIN ANALYZE  ' + sql_query
+                sql_query_analyze = 'EXPLAIN ANALYZE  ' + sql_query
 
                 if request.form.get('action')=='chatgpt':
-                    rows = database.generic_select_with_sql(session,sql_query_analzye)
-                    chatgpt = llm.get_llm_query_for_query_analyze(sql_query=sql_query_analzye, rows=rows, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
+                    rows = database.generic_select_with_sql(session,sql_query_analyze)
+                    chatgpt = llm.get_llm_query_for_query_analyze(sql_query=sql_query_analyze, rows=rows, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
 
                     chatgpt_response=llm.query_chatgpt(chatgpt)
                     return render_template('home/chatgpt.html', chatgpt_response=chatgpt_response)
                 elif request.form.get('action')=='analyze':                   
                     parameters = {}
-                    rows = database.generic_select_with_sql(session,sql_query_analzye)
-                    chatgpt = llm.get_llm_query_for_query_analyze(sql_query=sql_query_analzye, rows=rows, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
+                    rows = database.generic_select_with_sql(session,sql_query_analyze)
+                    chatgpt = llm.get_llm_query_for_query_analyze(sql_query=sql_query_analyze, rows=rows, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
                 elif request.form.get('action')=='optimize':
                     question_optimize=llm.get_llm_query_for_query_optimize(sql_query)
                     chatgpt_response=llm.query_chatgpt(question_optimize)
@@ -281,8 +283,8 @@ def analyze_query(querid):
             else:
                 # try to extract parameter datatype from query
                 genius_parameters=sqlhelper.get_genius_parameters(sql_query,session)
-
-            return render_template('home/analyze.html', parameters=parameters, query=sql_query, rows=rows, description='Analyze query',chatgpt=chatgpt, tables=tables, genius_parameters=genius_parameters )
+           
+            return render_template('home/analyze.html', parameters=parameters, query=sql_query, rows=rows, description='Analyze query',chatgpt=chatgpt, tables=tables, genius_parameters=genius_parameters, analyze_explain_row=sqlhelper.analyze_explain_row )
         else:
             dbinfo= {}
             return redirect("/database.html")

@@ -77,3 +77,11 @@
 ### Bug Fixes
 - When a query has more than 9 parameters, parameter replacement fails.
 
+## [1.7.1] - 2025-02-07
+### Features
+- Add comments on EXPLAIN ANALYZE to help dev understand the output of an EXPLAIN ANALYZE result.
+- In the statistics view, add columns involved in the queries and operation types. Next step in v1.8: check if indexes exist on these columns (goal: recommend missing indexes to optimize queries).
+### Bug Fixes
+- Top queries bug with postgresql 17 : pg_stat_statements missing columns with this version
+- Upgrade base docker image to get the latest postgresql client : v17.  
+- Filter queries that can not be used in an EXPLAIN ANALYZE query 

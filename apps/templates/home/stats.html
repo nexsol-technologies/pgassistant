@@ -23,33 +23,66 @@
 
 <!--table statistics-->
 
-  <div class="card border-0 shadow mb-4">
-    <div class="card-body">
+<div class="card border-0 shadow mb-4">
+  <div class="card-body">
       <div class="table-responsive">
-          <table class="table table-striped" style="width:100%" id="topqueries" >
+          <table class="table table-striped" style="width:100%" id="topqueries">
               <thead class="thead-light">
                   <tr>
-                      {%for row in table_stats[0]: %}
+                      {% for row in table_stats[0] %}
                       <th>{{ row }}</th>                     
                       {% endfor %}
                   </tr>
               </thead>
               <tbody>
-                  <!-- Item -->
-                  {%for row in table_stats: %}
+                  <!-- Boucle sur les données -->
+                  {% for row in table_stats %}
                   <tr>
-                  {%for value in row %}                        
-                        <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal">      
-                        {{ row[value] }}
-                        </td>              
-                   {% endfor %}                     
+                      {% for key, value in row.items() %}
+                          <td style="word-wrap: break-word; min-width: 10px; max-width: 360px; white-space: normal">
+                              {% if key == "operation_type" and value is mapping %}
+                                  <!-- Affichage avec badges Bootstrap -->
+                                  {% for operation, count in value.items() %}
+                                    {% if "SELECT" in operation %}
+                                      <span class="badge bg-primary">
+                                    {% elif "INSERT" in operation %}
+                                      <span class="badge bg-success">
+                                    {% elif "UPDATE" in operation %}
+                                      <span class="badge bg-warning">
+                                    {% elif "DELETE" in operation %}
+                                      <span class="badge bg-danger">
+                                    {% else %}
+                                      <span class="badge bg-primary">
+                                    {% endif %}                                                                                      
+                                    {{ operation }} ({{ count }})</span>
+                                  {% endfor %}
+                              {% else %}
+                                  {{ value }}
+                              {% endif %}
+                          </td>
+                      {% endfor %}
                   </tr>
-                  {% endfor %}  
+                  {% endfor %}
               </tbody>
           </table>
       </div>
-    </div>
   </div>
+</div>
+
+<!-- ✅ column description -->
+<div class="card border-0 shadow mb-4">
+  <div class="card-body">
+      <h5 class="mb-3">📌 Column Descriptions</h5>
+      <ul class="list-group">
+          <li class="list-group-item"><strong>📂 table_name:</strong> Name of the table being queried.</li>
+          <li class="list-group-item"><strong>📊 query_count:</strong> Total number of different queries executed on this table.</li>
+          <li class="list-group-item"><strong>⏳ avg_execution_time:</strong> Average execution time of queries in seconds.</li>
+          <li class="list-group-item"><strong>📈 rows:</strong> Total number of rows affected by queries.</li>
+          <li class="list-group-item"><strong>📑 columns:</strong> List of columns involved in the queries in the WHERE clause.</li>
+          <li class="list-group-item"><strong>🔄 operation_type:</strong> Types of SQL operations performed on this table (<span class="badge bg-primary">SELECT</span>,<span class="badge bg-success">INSERT</span>, <span class="badge bg-warning">UPDATE</span>, <span class="badge bg-danger">DELETE</span>).</li>
+      </ul>
+  </div>
+</div>
 
 <script id="dt1" src="{{ config.ASSETS_ROOT }}/js/jquery-3.7.1.js" ></script>
 <!--<script id="dt2" src="{{ config.ASSETS_ROOT }}/js/bootstrap.bundle.min.js" ></script>-->

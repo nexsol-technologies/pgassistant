@@ -57,13 +57,15 @@
                     </div>
                     {% endfor %}
 
+                      
                     <div class="mt-3">
+                        {% if not rows %}
                         <button id="analyze" type="submit" class="btn btn-primary" name="submit_analyze" value="analyze" onclick="myButtonAnalyze(this)">
                             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                 d="m15 11.25 1.5 1.5.75-.75V8.758l2.276-.61a3 3 0 1 0-3.675-3.675l-.61 2.277H12l-.75.75 1.5 1.5M15 11.25l-8.47 8.47c-.34.34-.8.53-1.28.53s-.94.19-1.28.53l-.97.97-.75-.75.97-.97c.34-.34.53-.8.53-1.28s.19-.94.53-1.28L12.75 9M15 11.25 12.75 9"></path></svg>
                                 Analyze
-                        </button>                       
+                        </button>
                         <button type="button" class="btn btn-info" onclick="window.open('https://www.postgresql.org/docs/current/sql-explain.html','_blank')">
                             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -75,20 +77,22 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                 d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"></path></svg>
                                 Analyze with LLM
-                        </button>  
+                        </button>
                         <button id="optimizeopenai" type="submit" class="btn btn-danger" name="submit_analyze" value="optimize" onclick="myButtonAnalyzeOptimizeAI(this)">
                             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                 d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"></path></svg>
                                 Optimize with LLM
-                        </button>                          
+                        </button>
+                        {% endif %} 
                         <button id="ddl" type="submit" class="btn btn-info" name="submit_analyze" value="ddl" onclick="myButtonDDL(this)">
                             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                                DDL
-                        </button>                          
-                    </div>  
+                        </button>
+                    </div>
+                     
                     <div class="mt-3">
 
                     </div>                             
@@ -100,23 +104,18 @@
                       <table class="table table-centered table-nowrap mb-0 rounded" style="width: 600px" >
                           <thead class="thead-light">
                               <tr>
-                                  {%for row in rows[0]: %}
-                                  <th class="border-0 rounded-start">{{ row }}</th>                     
-                                  {% endfor %}
+                                <th>Row</th>
+                                <th>Comments</th>
                               </tr>
                           </thead>
                           <tbody>
-                              <!-- Item -->
-                              {%for row in rows: %}
-                              <tr>          
-                              {%for value in row %}                    
-                                  <td style="word-wrap: break-word;min-width: 10px;max-width: 360px; white-space: normal">
-                                      {{ row[value] }}
-                                  </td>
-                                  {% endfor %}                     
-                              </tr>
-                              {% endfor %}  
-                          </tbody>
+                            {% for row in rows %}
+                            <tr>
+                                <td>{{ row['QUERY PLAN'] }}</td>
+                                <td>{{ analyze_explain_row(row) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
                       </table>
                   </div>
 
