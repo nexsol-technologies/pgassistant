@@ -2,8 +2,8 @@
     "sql":
     [
             {
-                "id": "search a firsname",
-                "description": "search a firsname",
+                "id": "search a firstname",
+                "description": "search a firstname",
                 "category": "Database",        
                 "sql": "select * from firstname where firstname like '$1%';",
                 "type": "param_query",
