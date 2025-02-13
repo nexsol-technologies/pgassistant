@@ -33,7 +33,7 @@ pgAssistant needs the **pg_stat_statements** postgresql module to run.
 
 To activate this module on your database is very simple. Below, you will find an example of how to activate it if you are in a Docker environment, as well as the PostgreSQL documentation.
 
-- Docker environnement sample here : https://github.com/nexsol-technologies/pgassistant-postgres-sample/tree/main
+- Docker environment sample here : https://github.com/nexsol-technologies/pgassistant-postgres-sample/tree/main
 - Postgresql documentation here : https://www.postgresql.org/docs/current/pgstatstatements.html
 
 ## Special thanks
