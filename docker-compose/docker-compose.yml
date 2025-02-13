@@ -1,6 +1,7 @@
 services:
   pgassistant:
-    image: nexsoltech/pgassistant:latest
+#    image: nexsoltech/pgassistant:latest
+    image: test:0
     restart: always
     environment:
       - OPENAI_API_KEY=nothing
