@@ -1,2 +1,2 @@
 docker compose down
-docker compose up -d
+docker compose up --pull always -d
