@@ -57,13 +57,48 @@ def get_llm_query_for_query_analyze (host, port, database, user, password, sql_q
     llm += (
     "\n\n**Important Notice:** When suggesting optimizations, especially related to indexes, please carefully review the DDL provided above. "
     "Some indexes may already exist, and redundant or unnecessary index recommendations should be avoided. Ensure any suggested indexes align "
-    "with the schema and constraints defined in the DDL."
+    "with the schema and constraints defined in the DDL. Never forget that primary keys are always indexed."
     )
     llm += (
     "\nFeel free to reflect on possible optimizations and reasoning before finalizing your response. Ensure all suggestions are well-supported "
     "and avoid any unnecessary or redundant recommendations."
     )
     return llm
+
+def generate_primary_key_prompt(table_name: str, ddl: str) -> str:
+    """
+    Generates a prompt for an LLM to determine the best primary key for a PostgreSQL table
+    and provide the necessary ALTER TABLE command.
+
+    Args:
+        table_name (str): The name of the table.
+        ddl (str): The DDL (Data Definition Language) statement for the table.
+
+    Returns:
+        str: A formatted prompt for the LLM.
+    """
+    prompt = f"""
+I have a PostgreSQL table that does not have a primary key. In some cases, a natural key (like an ISO country code) is a good choice, 
+but when no stable unique column exists, a technical key (`SERIAL` or `UUID`) is preferable.
+
+A technical key is best when:
+- No single column or combination of columns is reliably unique.
+- Natural keys are too large, unstable, or inefficient for indexing.
+- Composite keys make queries and relationships complex.
+- The table is large, requiring fast lookups and indexing.
+- The system is distributed and needs globally unique identifiers.
+
+Given the following table structure, suggest the most appropriate primary key (either an existing column or a new technical key) and explain why.
+
+Additionally, provide the necessary **ALTER TABLE** SQL command(s) to implement your suggested primary key.
+
+**Table Name:** {table_name}  
+**DDL:**  
+```sql
+{ddl}
+```
+"""
+    return prompt
 
 def get_llm_query_for_query_optimize (sql_query):
     llm = (

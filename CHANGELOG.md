@@ -85,3 +85,12 @@
 - Top queries bug with postgresql 17 : pg_stat_statements missing columns with this version
 - Upgrade base docker image to get the latest postgresql client : v17.  
 - Filter queries that can not be used in an EXPLAIN ANALYZE query 
+
+## [1.7.2] - 2025-02-13
+### Features
+- Enable pg_stat_statment at connexion.
+- Some LLM seams to forget that primary keys are always indexed. Changing the LLM prompt to fix that. 
+### Bug Fixes
+- Fix issues/7
+- Fix issues/5 (I hope so)
+

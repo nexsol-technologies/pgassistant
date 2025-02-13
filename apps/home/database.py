@@ -148,6 +148,21 @@ def get_db_info(db_config,con=None):
 
     if con:
         if db_config:
+            # Enable pg_stat_statements_enable if it is not enabled (it is not enable by default)
+            try:
+                cursor = con.cursor()
+                cursor.execute('CREATE EXTENSION IF NOT EXISTS pg_stat_statements;')
+            except psycopg2.Error as e:  # Catch PostgreSQL-specific errors
+                error_msg = f"Error while enabling pg_stat_statements: {e.pgcode or 'Unknown Code'} - {e.pgerror or str(e)}"
+                info["error"] = error_msg  # Now captures error details properly
+                return info
+            except Exception as e:  # Catch any other exceptions
+                info["error"] = f"Unexpected error: {str(e)}"
+                return info
+            finally:
+                if cursor is not None:  
+                    cursor.close()  # Ensure the cursor is closed properly
+
             version, _= db_query(con,'db_version')
             info['version']=version[0]['server_version']
 

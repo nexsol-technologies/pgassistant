@@ -52,7 +52,7 @@
             "id": "table_size",
             "description": "All tables size",                        
             "category": "Table",        
-            "sql": "select table_name, (SELECT n_live_tup FROM pg_stat_user_tables where relname=table_name ORDER BY n_live_tup desc limit 1) as row_count, pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size, pg_total_relation_size(quote_ident(table_name)) from information_schema.tables where table_schema  not in ('pg_catalog','information_schema') order by 4 desc;",
+            "sql": "SELECT schemaname AS schema_name, relname AS table_name, n_live_tup AS row_count,  pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(relname))) AS size,  pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(relname)) AS size_bytes FROM pg_stat_user_tables ORDER BY size_bytes DESC",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/9.1/functions-admin.html"
         },
@@ -60,10 +60,10 @@
             "id": "table_size_top_5",
             "description": "Top 5 tables size",                        
             "category": "Table",        
-            "sql": "select table_name, (SELECT n_live_tup FROM pg_stat_user_tables where relname=table_name ORDER BY n_live_tup desc limit 1) as row_count, pg_size_pretty(pg_total_relation_size(quote_ident(table_name))) as size, pg_total_relation_size(quote_ident(table_name)) from information_schema.tables where table_schema  not in ('pg_catalog','information_schema') order by 4 desc limit 5;",
+            "sql": "SELECT schemaname AS schema_name, relname AS table_name, n_live_tup AS row_count,  pg_size_pretty(pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(relname))) AS size,  pg_total_relation_size(quote_ident(schemaname) || '.' || quote_ident(relname)) AS size_bytes FROM pg_stat_user_tables ORDER BY size_bytes DESC LIMIT 5;",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/9.1/functions-admin.html"
-        },        
+        },    
         {
             "id": "table_io",
             "category": "Table",
@@ -148,7 +148,7 @@
             "id": "index_definition",
             "category": "Indexe",
             "description": "Indexes definitions",
-            "sql": "SELECT schemaname, indexname, indexdef FROM pg_indexes WHERE indexname not like 'pg_%' ORDER BY indexname;",
+            "sql": "SELECT schemaname, tablename, indexname, indexdef FROM pg_indexes WHERE schemaname != 'pg_catalog' ORDER BY schemaname, tablename, indexname;",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/current/view-pg-indexes.html"
         },
