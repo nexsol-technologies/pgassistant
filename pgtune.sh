@@ -82,7 +82,7 @@ set_db_default_values() {
       max_worker_processes=8
       max_parallel_workers_per_gather=0
       ;;
-    "10" | "11" | "12" | "13" | "14" | "15" | "16")
+    "10" | "11" | "12" | "13" | "14" | "15" | "16" | "17")
       max_worker_processes=8
       max_parallel_workers_per_gather=2
       max_parallel_workers=8
@@ -420,7 +420,8 @@ while getopts "hv:t:m:u:c:s:" opt; do
       [ $v != "13" ] && \
       [ $v != "14" ] && \
       [ $v != "15" ] && \
-      [ $v != "16" ]
+      [ $v != "16" ] && \
+      [ $v != "17" ]
       then
         _input_error "$v is not a valid PostgreSQL version number"
       fi

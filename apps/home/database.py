@@ -38,7 +38,8 @@ def connectdb(db_config):
                             port=db_config["db_port"],
                             connect_timeout=5,
                             application_name="pgAssistant 1.7")
-        con.set_session(autocommit=True)
+        #con.set_session(autocommit=True)
+        con.autocommit = True
     except psycopg2.Error as err:
         return None, format(err).rstrip()
     return con, "OK"
@@ -60,6 +61,7 @@ def db_exec_recommandation(conn, sql):
         conn.set_session(autocommit=True)
         cursor = conn.cursor()
         cursor.execute(sql)
+        conn.commit()  
         return {"success": True, "message": f"SQL executed successfully: {sql}"}
     except Exception as e:
         return {"success": False, "error": str(e)}

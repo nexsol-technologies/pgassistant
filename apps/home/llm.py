@@ -28,7 +28,7 @@ def query_chatgpt(question):
             {"role": "user", "content": question }
         ],
         temperature=0.2,
-        max_tokens=500,
+        max_tokens=2000,
         frequency_penalty=0.1,
         presence_penalty=0.6,
         n=1  
@@ -92,6 +92,8 @@ Given the following table structure, suggest the most appropriate primary key (e
 
 Additionally, provide the necessary **ALTER TABLE** SQL command(s) to implement your suggested primary key.
 
+**One more thing** : Can you also check if the column types and their lengths in the following table are appropriate based on their names and potential usage ? Please mention RFC conventions if any exist end provide an ALTER command to change the column data type or length.
+
 **Table Name:** {table_name}  
 **DDL:**  
 ```sql
@@ -99,6 +101,56 @@ Additionally, provide the necessary **ALTER TABLE** SQL command(s) to implement 
 ```
 """
     return prompt
+
+def analyze_table_format (ddl: str) -> str:
+    llm_prompt = f"""
+# 📌 SQL Table Structure Validation Based on RFC & International Standards (PostgreSQL Compatible)
+
+## **Task**  
+You are an expert in **database design**, **SQL optimization**, and **data standards**. Your goal is to **validate the structure of a SQL table (DDL)** based on relevant **RFCs, international standards, and best practices**.  
+
+## **Instructions**  
+1. **Analyze the given DDL statement** and verify whether it adheres to **established standards and best practices** in different domains, including:  
+   - **Networking & Web** (RFCs for emails, domain names, and addresses)  
+   - **Healthcare** (FHIR, HL7)  
+   - **E-commerce & Invoicing** (UBL, UN/CEFACT, EDIFACT)  
+   - **Finance & Payments** (ISO 20022, IBAN, BIC, SWIFT, PCI-DSS)  
+   - **Geolocation** (ISO 3166 for country codes, ISO 6709 for geolocation)  
+   - **Personal Data & Identity** (ISO 5218 for gender, ISO 27799 for health privacy, OIDC/SAML for identity management)  
+   - **Date & Time** (ISO 8601)  
+   - **Languages & Localization** (ISO 639 for language codes, ISO 4217 for currencies)  
+   - **Database Best Practices** (Normalization, indexing, constraints)  
+2. **Validate column types, sizes, constraints, and indexes**, ensuring compliance with:  
+   - **RFC 5322** for **email addresses**  
+   - **RFC 6350** for **names and addresses (vCard format)**  
+   - **RFC 3696** for **name and domain validation**  
+   - **FHIR (HL7 Fast Healthcare Interoperability Resources)** for **medical data**  
+   - **UBL (Universal Business Language)** for **invoices and orders**  
+   - **ISO 20022** for **financial transactions**  
+   - **ISO 3166** for **country codes**  
+   - **ISO 5218** for **gender classification**  
+   - **ISO 4217** for **currency codes**  
+   - **ISO 8601** for **date and time formats**  
+   - **E.164** for **phone number formatting**  
+3. **Propose improvements**:  
+   - Adjust **column data types or sizes** if necessary  
+   - Add missing **constraints** (e.g., `NOT NULL`, `UNIQUE`, `CHECK`)  
+   - Optimize **indexing strategies** for better performance  
+4. **Generate SQL `ALTER TABLE` statements**, ensuring **100% PostgreSQL compatibility**:  
+   - **Use PostgreSQL syntax for altering column types** (`ALTER COLUMN ... SET DATA TYPE`)  
+   - **Use `ADD CONSTRAINT ... CHECK(...)` for validations**  
+   - **Use `CREATE INDEX` to improve search performance**  
+5. **Provide justifications** for each recommended change based on relevant standards.  
+
+---
+
+## **Here is the DDL to analyze**  
+```sql
+{ddl}
+```
+"""
+    return llm_prompt
+
 
 def get_llm_query_for_query_optimize (sql_query):
     llm = (

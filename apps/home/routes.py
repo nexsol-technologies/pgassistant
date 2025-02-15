@@ -139,6 +139,19 @@ def handle_topstatistics_get(template: str, segment: str):
     else:
         return redirect("/database.html")
 
+def handle_primarykey_get(template: str, segment: str):
+    if session.get("db_name"):
+            query_rows,description=database.generic_select(session,"issue_no_pk")
+            return render_template("home/primary_key.html", rows=query_rows, segment=segment, description=description )
+    else:
+        return redirect("/database.html")
+
+def handle_table_rfc_get(template: str, segment: str):
+    if session.get("db_name"):
+            query_rows,description=database.generic_select(session,"table_list")
+            return render_template("home/table_rfc.html", rows=query_rows, segment=segment, description=description )
+    else:
+        return redirect("/database.html")
 
 def handle_myqueries_get():
     queries=database.get_my_queries()
@@ -341,8 +354,9 @@ def route_template(template: str):
     try:
         if not template.endswith('.html'):
             template += '.html'
-
+        
         segment = get_segment(request)
+        
         if segment == "database.html" and request.method == 'POST':
             return handle_database_post(segment)
         elif segment == "database.html":
@@ -367,13 +381,41 @@ def route_template(template: str):
             return handle_pgtune_post()
         elif segment == "myqueries.html":
             return handle_myqueries_get()
-        
+        elif segment == "primary_key.html" and request.method == 'GET':
+            return handle_primarykey_get(template, segment)
+        elif segment == "table_rfc.html"  and request.method == 'GET':
+            return handle_table_rfc_get(template, segment)
         return render_template(f"home/{template}", segment=segment, dbinfo={})
     except TemplateNotFound:
         return render_template('home/page-404.html'), 404
     except Exception as e:
         traceback.print_exc()
         return render_template('home/page-500.html', err=str(e)), 500
+
+@blueprint.route('/primary_key_llm/<schema>/<tablename>', methods=['GET','POST'])
+def llm_primary_key(schema: str, tablename:str):
+    tables = []
+    tables.append (f"{schema}.{tablename}")
+    ddl_str = ddl.generate_tables_ddl(tables=tables, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
+    llm_prompt = llm.generate_primary_key_prompt(table_name=f"{schema}.{tablename}",ddl=ddl_str)
+    if request.method == 'GET':
+        return render_template('home/primary_key_llm.html', sql_text=ddl.sql_to_html(ddl_str), table_name=f"{schema}.{tablename}", llm_prompt=llm_prompt, title=f"Find a primary key for {schema}.{tablename}")
+    else:
+        chatgpt_response=llm.query_chatgpt(llm_prompt)
+        return render_template('home/chatgpt.html', chatgpt_response=chatgpt_response)        
+
+@blueprint.route('/table_llm/<schema>/<tablename>', methods=['GET','POST'])
+def llm_table(schema: str, tablename:str):
+    tables = []
+    tables.append (f"{schema}.{tablename}")
+    ddl_str = ddl.generate_tables_ddl(tables=tables, database=session['db_name'], host=session["db_host"], user=session["db_user"],port=session["db_port"],password=session["db_password"])
+    llm_prompt = llm.analyze_table_format(ddl=ddl_str)
+    if request.method == 'GET':
+        return render_template('home/primary_key_llm.html', sql_text=ddl.sql_to_html(ddl_str), table_name=f"{schema}.{tablename}", llm_prompt=llm_prompt, title=f"Analyze table definition for {schema}.{tablename}")
+    else:
+        chatgpt_response=llm.query_chatgpt(llm_prompt)
+        return render_template('home/chatgpt.html', chatgpt_response=chatgpt_response)        
+
 
 # Helper - Extract current page name from request
 def get_segment(request):

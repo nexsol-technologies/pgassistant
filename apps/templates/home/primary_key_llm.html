@@ -1,0 +1,109 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Settings {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+        <div class="row">
+        <div class="col-12 col-xl-8">
+            <div class="card card-body border-0 shadow mb-1">
+                <h2 class="h5 mb-1">{{ title }}</h2>
+
+                {{ sql_text|safe }}
+
+
+                <br>
+                <form method="POST" id="form_analyse">
+                    <input class="form-control" value="" id="action" name="action" type="hidden" >
+                      
+                    <div class="mt-3">
+                        <button id="analyzeopenai" type="submit" class="btn btn-tertiary" name="submit_analyze" value="chatgpt" onclick="myButtonAnalyzeOpenAI(this)">
+                            <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"></path></svg>
+                                Analyze with LLM
+                        </button>
+                    </div>
+                     
+                    <div class="mt-3">
+
+                    </div>                             
+                </form>
+            </div>
+            <div class="card border-0 shadow mb-4">
+                <div class="card-body">
+                  <div>
+                    
+                    <!-- Button Modal -->
+                    <button type="button" class="btn btn-block btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalSubscribe">Give me an LLM prompt
+                        <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"></path></svg>                    
+                    </button>
+
+                    <!-- Modal Content -->
+                    <div class="modal fade" id="modalSubscribe" tabindex="-1" role="dialog" aria-labelledby="modalTitleSubscribe" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                            <div class="modal-content py-xl-4">
+                                <div class="modal-body text-center py-3">
+                                    <svg class="icon icon-xl text-primary mb-4" fill="none" stroke="currentColor" 
+                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"></path></svg>
+                                    
+                                    <p class="mb-4 lead">You can try this formulation with an LLM</p>
+                                    <div class="form-group px-lg-5">
+                                        <div class="d-flex mb-3 justify-content-center">
+                                            <textarea class="form-control" name="chatgpt" id="chatgpt" rows="10">{{ llm_prompt }}</textarea>
+                                            <div>
+                                                <button onclick="copy()" type="button" class="btn btn-info d-inline-flex align-items-center">
+                                                    Copy
+                                                    <svg class="icon icon-xs ms-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" clip-rule="evenodd" /></svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer z-2 mx-auto text-center">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End of Modal Content -->                    
+                  </div>
+            </div>        
+        </div>
+    </div>
+
+    <script>
+       
+        function copy() {
+            let textarea = document.getElementById("chatgpt");
+            textarea.select();
+            document.execCommand("copy");
+        }
+
+        function myButtonAnalyzeOpenAI(el) {       
+              const form = document.getElementById("form_analyse")
+              if(form.checkValidity()) {
+                document.getElementById("analyzeopenai").disabled=true;
+                document.getElementById("analyzeopenai").innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Analyzing  ...';
+                
+                but = document.getElementById("action")
+                but.setAttribute('value','chatgpt')
+                form.submit();
+              } else {
+                    form.reportValidity()
+              }              
+        }
+       
+    </script>
+
+{% endblock content %}
+
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

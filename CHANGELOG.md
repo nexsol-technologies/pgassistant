@@ -94,3 +94,10 @@
 - Fix issues/7
 - Fix issues/5 (I hope so)
 
+## [1.8] - 2025-02-15
+### Features
+- Help dev to find a primary key. See a sample result here on [primary key issues](media/issue_missing_pk.png);
+- For each table and schema, ask the LLM if the table definitions comply with relevant RFC(s). See sample [here](media/table_structure.png)
+- Somebody notice that on foreign keys issues (missing indexes), the suggest query did not use the CREATE INDEX **CONCURRENTLY**. pgAssistant should be used BEFORE to get in production, but a quick copy/paste maybe dangerous. 
+### Bug Fixes
+- With postgresql v17, pgTune is not working

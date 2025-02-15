@@ -9,6 +9,14 @@
             "type": "select",
             "reference": "https://www.postgresql.org/docs/current/sql-show.html"
         },
+        {
+            "id": "table_list",
+            "description": "Analyze tables structure with LLM to check RFC(s) compliance",
+            "category": "table",
+            "sql" : "SELECT table_schema, table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' and table_schema not in ('pg_catalog', 'information_schema') ORDER BY table_schema, table_name;",
+            "type": "select",
+            "reference": ""
+        },
         {   "id": "vacuum_suggestions_by_table",
             "description": "Vacuum suggestions by tables",
             "category": "Database",
@@ -180,7 +188,7 @@
             "category": "Issue",
             "id": "issue_idx_fk_missing",
             "description": "Issue - Indexes missing on foreign keys",
-            "sql": "WITH fkeys_without_indexes AS (SELECT conname AS fk_name, conrelid::regclass AS table_name, a.attname AS column_name, n.nspname AS schema_name, condeferrable AS is_deferrable, confupdtype AS update_action, confdeltype AS delete_action, conkey FROM pg_constraint c JOIN pg_namespace n ON n.oid = c.connamespace JOIN pg_class r ON r.oid = c.conrelid JOIN unnest(c.conkey) AS col_num ON true JOIN pg_attribute a ON a.attnum = col_num AND a.attrelid = r.oid LEFT JOIN pg_index i ON i.indrelid = r.oid AND col_num = ANY (i.indkey) WHERE c.contype = 'f' AND i.indexrelid IS NULL), suggested_indexes AS (SELECT schema_name, table_name, column_name, 'CREATE INDEX CONCURRENTLY pga_idx_fk_' || table_name || '_' || column_name || ' ON ' || schema_name || '.' || table_name || '(' || column_name || ');' || 'ANALYZE ' || schema_name || '.' || table_name || ';' AS pga_suggestion FROM fkeys_without_indexes) SELECT schema_name, table_name, column_name, pga_suggestion FROM suggested_indexes ORDER BY schema_name, table_name, column_name;",
+            "sql": "WITH fkeys_without_indexes AS (SELECT conname AS fk_name, conrelid::regclass AS table_name, a.attname AS column_name, n.nspname AS schema_name, condeferrable AS is_deferrable, confupdtype AS update_action, confdeltype AS delete_action, conkey FROM pg_constraint c JOIN pg_namespace n ON n.oid = c.connamespace JOIN pg_class r ON r.oid = c.conrelid JOIN unnest(c.conkey) AS col_num ON true JOIN pg_attribute a ON a.attnum = col_num AND a.attrelid = r.oid LEFT JOIN pg_index i ON i.indrelid = r.oid AND col_num = ANY (i.indkey) WHERE c.contype = 'f' AND i.indexrelid IS NULL), suggested_indexes AS (SELECT schema_name, table_name, column_name, 'CREATE INDEX CONCURRENTLY pga_idx_fk_' || table_name || '_' || column_name || ' ON ' || schema_name || '.' || table_name || '(' || column_name || ');' || 'ANALYZE ' || schema_name || '.' || table_name || ';' AS pga_suggestion_noexec FROM fkeys_without_indexes) SELECT schema_name, table_name, column_name, pga_suggestion_noexec FROM suggested_indexes ORDER BY schema_name, table_name, column_name;",
             "type": "select",
             "reference": "https://stratoflow.com/how-to-find-missing-foreign-key-indexes-in-postgresql/"
         },

@@ -21,10 +21,25 @@ PgAssistant is an open-source tool designed to help developers understand and op
 - **Get DDL**: get DDL of Top [queries](media/ddl.png) - pgAssistant is using **pg_dump** to achieve this.
 - **PGTune**: [PGTune](media/pgtune.png) is on board. Connected to your DB, pgAssistant can help your ALTER SYSTEM parameters !
 - **Docker**: based on pgTune recommandations, pgAssistant can help you writing a [docker-compose](media/pgtune-docker.png)
+- **NEW in version 1.8**: 
+    - **RFC compliance** : For each table, ask the LLM if the table definitions comply with relevant RFC(s). See sample [here](media/table_structure.png). You will find this in a new menu : Table definition.
+    - pgAssistant can help you to **find a primary key** with LLM : See sample [here](media/issue_missing_pk.png)
 
 ## Screen shots
 
 <img src="media/dashboard.png" alt="Dashboard" height="640px"/>
+
+## Mindset
+
+Some existing tools, can be used to optimize your queries. The strength of these tools lies in their deterministic nature. However, they will never tell you if a column is RFC non-compliant, nor will they suggest alternative ways to optimize a query beyond performance metrics.
+
+We believe that LLMs can accomplish tasks that deterministic tools simply cannot, providing deeper insights, compliance checks, and intelligent query optimizations.
+
+Of course, LLMs can make mistakes—and not just small ones. It’s crucial to choose the right model, test extensively, and always keep in mind that the accuracy rate is not 100%. However, by using models like OpenAI, Claude, or Codestral, which we have tested on numerous databases, we believe pgAssistant can effectively help developers refine their schemas and optimize their queries.
+
+Please use pgAssistant in a non-production environment. The purpose of this tool is to help you fix your database before it goes into production.
+
+Finally, pgAssistant was designed to help developers design and understand their PostgreSQL database. The initial idea was clearly to make developers as autonomous as possible, educate them, and also reduce the need for DBA expertise.
 
 
 ## Before you begin
