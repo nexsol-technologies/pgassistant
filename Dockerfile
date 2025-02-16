@@ -2,7 +2,7 @@
 FROM python:3-alpine3.21
 
 # Combine related APK commands to reduce image layers and cleanup cache
-RUN apk add --no-cache --update \
+RUN apk update && apk upgrade && apk add --no-cache \
     postgresql-client \
     util-linux \
     bash && \

@@ -21,6 +21,7 @@ PgAssistant is an open-source tool designed to help developers understand and op
 - **Get DDL**: get DDL of Top [queries](media/ddl.png) - pgAssistant is using **pg_dump** to achieve this.
 - **PGTune**: [PGTune](media/pgtune.png) is on board. Connected to your DB, pgAssistant can help your ALTER SYSTEM parameters !
 - **Docker**: based on pgTune recommandations, pgAssistant can help you writing a [docker-compose](media/pgtune-docker.png)
+- **On top queries**, pgAssistant help you to provide [values](media/analyze_parameters.png) on parameters and comment the results of EXPLAIN ANALYZE [output](media/analyze_result.png). 
 - **NEW in version 1.8**: 
     - **RFC compliance** : For each table, ask the LLM if the table definitions comply with relevant RFC(s). See sample [here](media/table_structure.png). You will find this in a new menu : Table definition.
     - pgAssistant can help you to **find a primary key** with LLM : See sample [here](media/issue_missing_pk.png)
