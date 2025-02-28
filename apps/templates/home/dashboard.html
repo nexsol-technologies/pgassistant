@@ -15,9 +15,11 @@
                     <div class="row d-block d-xl-flex align-items-center">
                         <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
                             <div class="icon-shape icon-shape-primary rounded me-4 me-sm-0">
-                                <svg class="icon" data-slot="icon" fill="none" stroke="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"></path></svg>
+                                <svg class="icon" data-slot="icon" fill="none" stroke="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125">
+                                    </path>
+                                </svg>
                             </div>
-
                         </div>
                         <div class="col-12 col-xl-7 px-xl-0">
                             <div class="d-none d-sm-block">
@@ -26,7 +28,6 @@
                                 <h3 class="fw-extrabold mb-2">{{ dbinfo['version'] }}</h3>
                                 </a>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -62,8 +63,42 @@
                         </div>
                         <div class="col-12 col-xl-7 px-xl-0">
                             <div class="d-none d-sm-block">
-                                <h2 class="h6 text-gray-400 mb-0"> Hit cache ratio</h2>
-                                <h3 class="fw-extrabold mb-2">{{ dbinfo['cache'] }} %</h3>
+                                <h2 class="h6 text-gray-400 mb-0"> Hit Cache Ratio</h2>
+                                <a href="/cache_table.html" class="d-flex align-items-center fw-bold">
+                                    <svg class="icon icon-xs text-gray-500 me-2" viewBox="0 0 20 20" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6"></path>
+                                    </svg>
+                                
+                        
+                                    <!-- Condition pour afficher une icône en fonction de la valeur du cache hit ratio -->
+                                    <div class="d-flex align-items-center">
+                                        <h3 class="fw-extrabold mb-2">{{ dbinfo['cache'] }} %</h3>
+                                        
+                                        <!-- Détermination de l'icône en fonction du cache hit ratio -->
+                                        {% if dbinfo['cache'] >= 99 %}
+                                            <svg class="icon icon-sm text-success ms-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M9 12l2 2 4-4"></path>
+                                            </svg> <!-- ✅ Excellent (icône check vert) -->
+                                        {% elif dbinfo['cache'] >= 95 %}
+                                            <svg class="icon icon-sm text-primary ms-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M9 12h6"></path>
+                                            </svg> <!-- 👍 Good (icône tiret bleu) -->
+                                        {% elif dbinfo['cache'] >= 90 %}
+                                            <svg class="icon icon-sm text-warning ms-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M12 8v4m0 4h.01"></path>
+                                            </svg> <!-- ⚠️ Average (icône warning orange) -->
+                                        {% else %}
+                                            <svg class="icon icon-sm text-danger ms-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                            </svg> <!-- ❌ Poor (icône croix rouge) -->
+                                        {% endif %}
+                                    </div>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -307,8 +342,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            
+            </div>           
         </div>
     </div>
 

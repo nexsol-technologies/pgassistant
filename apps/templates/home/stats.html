@@ -57,7 +57,16 @@
                                     {{ operation }} ({{ count }})</span>
                                   {% endfor %}
                               {% else %}
+                                {% if key == "table_name" %}
+                                  <a href="/topqueries.html?tablename={{ value | urlencode }}">
+                                    {{ value }}
+                                      <svg class="icon icon-xs text-gray-500 me-2" viewBox="0 0 20 20" data-slot="icon" fill="none" stroke-width="1.5" stroke="blue" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6"></path>
+                                      </svg>
+                                  </a>
+                                {% else %}
                                   {{ value }}
+                                {% endif %}
                               {% endif %}
                           </td>
                       {% endfor %}
@@ -75,7 +84,7 @@
       <h5 class="mb-3">📌 Column Descriptions</h5>
       <ul class="list-group">
           <li class="list-group-item"><strong>📂 table_name:</strong> Name of the table being queried.</li>
-          <li class="list-group-item"><strong>📊 query_count:</strong> Total number of different queries executed on this table.</li>
+          <li class="list-group-item"><strong>📊 query_count:</strong> Total number of queries executed on this table.</li>
           <li class="list-group-item"><strong>⏳ avg_execution_time:</strong> Average execution time of queries in seconds.</li>
           <li class="list-group-item"><strong>📈 rows:</strong> Total number of rows affected by queries.</li>
           <li class="list-group-item"><strong>📑 columns:</strong> List of columns involved in the queries in the WHERE clause.</li>

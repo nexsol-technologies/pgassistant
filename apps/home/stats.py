@@ -23,9 +23,10 @@ def add_or_update_table_info(tables_info, table_name, query_count, avg_execution
             table_info["rows"] += rows
 
             # Calcul du nouveau temps moyen pondéré
-            total_queries = table_info["query_count"]
+            total_queries = int(table_info["query_count"])
+            table_info["avg_execution_time"] = float(table_info["avg_execution_time"])
             table_info["avg_execution_time"] = (
-                (table_info["avg_execution_time"] * (total_queries - query_count)) + (avg_execution_time * query_count)
+                (float(table_info.get("avg_execution_time", 0)) * (total_queries - query_count)) + (float(avg_execution_time) * query_count)
             ) / total_queries
 
             # Met à jour le compteur d'opérations

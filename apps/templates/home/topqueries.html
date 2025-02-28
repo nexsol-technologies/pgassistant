@@ -33,7 +33,7 @@
                 </path></svg>
                 Enable module
             </button>
-          </div>        
+        </div>        
   </div>
 
   <div class="card border-0 shadow mb-4">
@@ -67,11 +67,11 @@
                                 </path></svg>
                             </button>
                             {% endif %}
-                            {% if row['mean_exec_time']<0.5 %}
+                            {% if row['mean_exec_time'] | float<0.5 %}
                             <span class="badge bg-success">OK</span>
-                            {% elif row['mean_exec_time']<1 %}
+                            {% elif row['mean_exec_time'] | float <1 %}
                             <span class="badge bg-secondary">OK</span>
-                            {% elif row['mean_exec_time']<5 %}
+                            {% elif row['mean_exec_time'] | float<5 %}
                             <span class="badge bg-warning text-dark">Warning</span>
                             {% else %}
                             <span class="badge bg-danger">Perf</span>

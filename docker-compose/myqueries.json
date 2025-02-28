@@ -17,6 +17,14 @@
                 "type": "select",
                 "reference": ""
                 
+            },
+            {
+                "id": "privileges",
+                "description": "test",
+                "category":"Database",
+                "sql": "SELECT grantee, privilege_type FROM information_schema.role_routine_grants WHERE routine_name = 'pg_stat_statements_reset';",
+                "type": "select",
+                "reference": ""
             }
             
     ]

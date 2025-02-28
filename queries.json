@@ -51,10 +51,17 @@
         {
             "id": "db_cache",
             "description": "Database hit cache ratio",            
-            "category": "Database",        
+            "category": "Cache",        
             "sql": "SELECT round (100*sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)),2)::float as ratio FROM pg_statio_user_tables;",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STATIO-ALL-TABLES-VIEW"
+        },
+        {
+            "id": "hit_cache_by_table",
+            "description": "Cache usage by table",
+            "category": "Cache",
+            "sql": "SELECT schemaname, relname AS table_name, ROUND(100 * heap_blks_hit / NULLIF(heap_blks_hit + heap_blks_read, 0), 2) AS table_cache_hit_ratio, ROUND(100 * idx_blks_hit / NULLIF(idx_blks_hit + idx_blks_read, 0), 2) AS index_cache_hit_ratio, CASE WHEN ROUND(100 * heap_blks_hit / NULLIF(heap_blks_hit + heap_blks_read, 0), 2) >= 99 THEN 'Excellent' WHEN ROUND(100 * heap_blks_hit / NULLIF(heap_blks_hit + heap_blks_read, 0), 2) BETWEEN 95 AND 98 THEN 'Good' WHEN ROUND(100 * heap_blks_hit / NULLIF(heap_blks_hit + heap_blks_read, 0), 2) BETWEEN 90 AND 94 THEN 'Average' ELSE 'Poor' END AS table_evaluation, CASE WHEN ROUND(100 * idx_blks_hit / NULLIF(idx_blks_hit + idx_blks_read, 0), 2) >= 99 THEN 'Excellent' WHEN ROUND(100 * idx_blks_hit / NULLIF(idx_blks_hit + idx_blks_read, 0), 2) BETWEEN 95 AND 98 THEN 'Good' WHEN ROUND(100 * idx_blks_hit / NULLIF(idx_blks_hit + idx_blks_read, 0), 2) BETWEEN 90 AND 94 THEN 'Average' ELSE 'Poor' END AS index_evaluation FROM pg_statio_user_tables ORDER BY index_cache_hit_ratio asc, table_cache_hit_ratio asc;",
+            "type": "select"
         },
         {
             "id": "table_size",
@@ -97,18 +104,26 @@
             "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"
         },
         {
+            "id": "pg_stat_reset",
+            "description": "Reset all statistics",            
+            "category": "cache",  
+            "sql": "SELECT pg_stat_reset();",
+            "type": "exec",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html"
+        },  
+        {
             "id": "pg_stat_statements_reset",
             "description": "Reset pg_stat_statements statistics",            
-            "category": "Database",  
+            "category": "Cache",  
             "sql": "SELECT pg_stat_statements_reset();",
             "type": "exec",
             "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"
-        },    
+        },              
         {
             "id": "top_queries",
             "description": "Top 50 queries",
             "category": "Query",  
-            "sql": "select query, calls, rows, total_exec_time,mean_exec_time,min_exec_time,max_exec_time,stddev_exec_time,shared_blks_hit/(shared_blks_hit+shared_blks_read)::NUMERIC*100 hit_cache_ratio,shared_blks_hit,shared_blks_read,shared_blks_written,shared_blks_dirtied,local_blks_hit,local_blks_read,local_blks_dirtied,temp_blks_read,temp_blks_written,wal_records,wal_fpi,wal_bytes,queryid from pg_stat_statements where shared_blks_hit > 0 and query not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' order by total_exec_time desc limit 50",
+            "sql": "select query, calls, rows, ROUND(cast(total_exec_time as numeric),2) as total_exec_time,ROUND(cast(mean_exec_time as numeric),5) as mean_exec_time,ROUND(cast(min_exec_time as numeric),5) as min_exec_time,ROUND(cast(max_exec_time as numeric),5) as max_exec_time,ROUND(cast(stddev_exec_time as numeric),5) as stddev_exec_time,round(shared_blks_hit/(shared_blks_hit+shared_blks_read)::NUMERIC*100,2) as hit_cache_ratio,shared_blks_hit,shared_blks_read,shared_blks_written,shared_blks_dirtied,local_blks_hit,local_blks_read,local_blks_dirtied,temp_blks_read,temp_blks_written,wal_records,wal_fpi,wal_bytes,queryid from pg_stat_statements where shared_blks_hit > 0 and query not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' order by total_exec_time desc limit 50",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/current/pgstatstatements.html"
         },
@@ -127,6 +142,14 @@
             "sql": "SELECT schemaname, relname, seq_scan, seq_tup_read / seq_scan AS tup_per_scan,(select query from pg_stat_statements where lower(query) like '%'||relname||'%' and lower(query) not like '%explain analyze%' and lower(query) not like '%pg_catalog%' and lower(query) not like 'copy%' and lower(query) not like 'set%' order by total_exec_time desc limit 1 ), last_seq_scan, seq_tup_read, idx_tup_fetch, last_vacuum, last_autovacuum, last_analyze FROM pg_stat_user_tables WHERE seq_scan > 0 order by seq_scan desc limit 50;",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/16/monitoring-stats.html#MONITORING-PG-STAT-ALL-TABLES-VIEW"
+        },
+        {
+            "id": "table_columns_stats",
+            "description": "Statistics of table columns",
+            "category": "Table",
+            "sql": "select schemaname, tablename, attname, null_frac, n_distinct,most_common_vals, correlation from pg_stats where schemaname not in ('pg_catalog','information_schema' ) order by schemaname, tablename,attname;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/view-pg-stats.html"
         },
         {
             "id": "index_unused",            

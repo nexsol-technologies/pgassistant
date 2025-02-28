@@ -25,7 +25,10 @@ PgAssistant is an open-source tool designed to help developers understand and op
 - **NEW in version 1.8**: 
     - **RFC compliance** : For each table, ask the LLM if the table definitions comply with relevant RFC(s). See sample [here](media/table_structure.png). You will find this in a new menu : Table definition.
     - pgAssistant can help you to **find a primary key** with LLM : See sample [here](media/issue_missing_pk.png)
-
+- **NEW in version 1.9**: 
+    - Analyze query, use pg_stats to get the most common values of a given parameter. See sample [here](media/analyze_parameters.png)
+    - Analyze query, get the indexe coverage of each table and column of the query. See sample [here](media/index_coverage.png)
+    - On dashboard, add a link on Hit Cache Ratio zooming on cache usage by table. Quick access on top queries with low usage of cache / index cache. See sample [here](media/cache_usage.png)
 ## Screen shots
 
 <img src="media/dashboard.png" alt="Dashboard" height="640px"/>

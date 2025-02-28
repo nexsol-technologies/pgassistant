@@ -1,6 +1,7 @@
 import datetime
 import decimal
 import time
+import re
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import json
@@ -9,7 +10,6 @@ import collections
 from flask import g
 from . import pgtune
 from . import sqlhelper
-
 
 PGA_QUERIES={}
 PGA_TABLES=[]
@@ -37,7 +37,7 @@ def connectdb(db_config):
                             password=db_config["db_password"],
                             port=db_config["db_port"],
                             connect_timeout=5,
-                            application_name="pgAssistant 1.7")
+                            application_name="pgAssistant")
         #con.set_session(autocommit=True)
         con.autocommit = True
     except psycopg2.Error as err:
@@ -96,20 +96,17 @@ def db_fetch_json(conn,sql):
 
 def get_top_queries(db_config):
     rows = []
-    
     con, message = connectdb(db_config)
     if con:
        try:
            rows,description=db_query(con,'top_queries')
        except:
            rows=[] 
-       con.close()
-    
+       con.close()  
     return rows
 
 def get_rank_queries(db_config):
-    rows = []
-    
+    rows = [] 
     con, message = connectdb(db_config)
     if con:
        try:
@@ -117,7 +114,6 @@ def get_rank_queries(db_config):
        except:
            rows=[] 
        con.close()
-    
     return rows
 
 def exec_cmd(db_config,query_id):
@@ -156,7 +152,7 @@ def get_db_info(db_config,con=None):
                 cursor.execute('CREATE EXTENSION IF NOT EXISTS pg_stat_statements;')
             except psycopg2.Error as e:  # Catch PostgreSQL-specific errors
                 error_msg = f"Error while enabling pg_stat_statements: {e.pgcode or 'Unknown Code'} - {e.pgerror or str(e)}"
-                info["error"] = error_msg  # Now captures error details properly
+                info["error"] = error_msg  
                 return info
             except Exception as e:  # Catch any other exceptions
                 info["error"] = f"Unexpected error: {str(e)}"
@@ -175,7 +171,7 @@ def get_db_info(db_config,con=None):
                 cache, _= db_query(con,'db_cache')
                 info["cache"]=cache[0]['ratio']
             except:
-                info["cache"]="???"
+                info["cache"]=0
 
             table_size, _= db_query(con,'table_size_top_5')
             info["table_size"]=table_size
@@ -299,8 +295,44 @@ def get_pg_tune_parameter(db_config):
             major=version
         
         con.close()
-
         return running_values, major
 
 
+def get_existing_indexes(db_config):
+    """
+    get existing indexes from PostgreSQL.
 
+    :return: Dictionnary {table_name: set(frozenset(columns))}
+    """
+    existing_indexes = {}
+    try:
+        conn, message = connectdb(db_config)
+        if (conn):
+            cur = conn.cursor()
+
+            query = """
+            SELECT tablename, indexdef FROM pg_indexes where schemaname !='pg_catalog';
+            """
+
+            cur.execute(query)
+            indexes = cur.fetchall()
+
+            for table, index_def in indexes:
+                
+                # Extract column names
+                match = re.search(r"ON\s+(?:ONLY\s+)?\S+\s+USING\s+\w+\s*\((.*?)\)", index_def, re.IGNORECASE)
+                if not match:
+                    print ("**** ERROR WHILE PARSING INDEXE DEFINITION > ", index_def, table)
+                if match:
+                    indexed_columns = tuple(col.strip() for col in match.group(1).split(","))  # Convertir en tuple (ordre important)
+                    
+                    if table not in existing_indexes:
+                        existing_indexes[table] = set()
+                    existing_indexes[table].add(indexed_columns)  # Stocker sous forme de tuple immuable
+
+            cur.close()
+            conn.close()
+    except Exception as e:
+        print(f"⚠️ Error while getting indexes definition : {e}")
+
+    return existing_indexes

@@ -1,8 +1,10 @@
 import re
 import psycopg2
+from datetime import datetime
 from sql_metadata import Parser
 from sql_formatter.core import format_sql
 from . import database
+from . import analyze_param
 import json
 
 def get_tables(query):
@@ -61,6 +63,60 @@ def replace_query_parameters(query, params):
 
     return modified_query
 
+def parse_most_common_vals(value):
+    """Parse PostgreSQL's most_common_vals field into a Python list."""
+    
+    print(value)
+    if not value or value == "{}":
+        return []  # Retourne une liste vide si NULL ou vide
+
+    # Vérifier si la valeur est bien une chaîne
+    if isinstance(value, tuple):  
+        value = value[0]  # Extraire la première valeur du tuple
+
+    if value is None:
+        return []
+
+    # Supprimer les accolades `{}` autour de la chaîne
+    value = value.strip("{}")
+
+    # Expression régulière pour capturer :
+    # - Les valeurs entre guillemets (ex: "John Doe", "2024-12-23 08:31:35.616712")
+    # - Les valeurs non guillemetées (ex: F, M, 2020-07-21, 1238)
+    pattern = r'"([^"]+)"|([^,]+)'
+
+    matches = re.findall(pattern, value)
+    
+    parsed_values = []
+    for match in matches:
+        raw_value = match[0] if match[0] else match[1]  # Priorité à la valeur entre guillemets
+
+        # Tentative de conversion en date (format PostgreSQL)
+        try:
+            parsed_value = str(datetime.strptime(raw_value, "%Y-%m-%d %H:%M:%S.%f"))  # Format timestamp
+        except ValueError:
+            try:
+                parsed_value = str(datetime.strptime(raw_value, "%Y-%m-%d"))  # Format date simple
+            except ValueError:
+                # Tentative de conversion en entier
+                try:
+                    parsed_value = int(raw_value)
+                except ValueError:
+                    parsed_value = raw_value  # Garder sous forme de chaîne si tout échoue
+        
+        parsed_values.append(parsed_value)
+
+    return parsed_values
+
+def extract_schema_table(full_name):
+    """Split vars 'schema.table' or 'table'."""
+    parts = full_name.split('.')
+    if len(parts) == 2:
+        schema, table = parts
+    else:
+        schema, table = None, parts[0]  # No schema=None
+    return schema, table
+
 def fetch_column_data(table, column, data_type, session):
     """
     Fetch up to 10 rows from a specific column of a table and return the result as a typed JSON array.
@@ -79,12 +135,30 @@ def fetch_column_data(table, column, data_type, session):
         if "OK" in msg:
         # Connect to the database
             with conn.cursor() as cursor:
+
+                # Try to select pg_stats most_columns_vals
+                schema, tablename = extract_schema_table(table)
+                if schema is None:
+                    query = f"select most_common_vals from pg_stats where tablename='{table}' and attname='{column}' limit 1"
+                else:
+                    query = f"select most_common_vals from pg_stats where schemaname='{schema}' and tablename='{tablename}' and attname='{column}' limit 1"
+
+                cursor.execute (query)
+                row = cursor.fetchall()
+               
+
+                if row and row[0]:  # check null values
+                    values_common=parse_most_common_vals(row[0])
+                    if len(values_common)>0:
+                        return values_common
+
                 # Generate the SQL query
                 query = f"SELECT {column} FROM {table} LIMIT 10;"
                               
                 # Execute the query
                 cursor.execute(query)
                 rows = cursor.fetchall()
+                
 
                 # Map PostgreSQL types to Python types
                 def convert_value(value):
@@ -146,70 +220,54 @@ def get_column_data_types(connection, table_column_pairs):
                 column_types[(f"{schema_name}.{table_name}", column_name)] = column_type
     except Exception as e:
         print(f"Error querying column data types: {e}")
+    
     return column_types
+
 
 def map_query_parameters(query, connection):
     """
-    Analyze the SQL query to map parameters ($1, $2, ...) to their table, column, and types.
+    Extracts SQL parameters and retrieves their corresponding data types from PostgreSQL.
+    
     Args:
         query: The SQL query string.
         connection: psycopg2 connection object.
+    
     Returns:
-        A dictionary { parameter: (table, column, data_type) }.
+        A dictionary { parameter: (table_name, column_name, data_type) }.
     """
-    # Use sql_metadata to parse the query
-    try:
-        parser = Parser(query)
-    except:
+    # Extraire les paramètres SQL et leurs colonnes associées
+    param_columns = analyze_param.extract_parameter_columns(query)
+
+    if not param_columns:
+        print("No SQL parameters found.")
         return {}
 
-    # Extract tables and columns from the query
-    tables = parser.tables  # List of tables in the query
-    columns_dict = parser.columns_dict  # Dictionary of columns by context
+    # Convertir les données pour la requête PostgreSQL
+    table_column_pairs = [(table_column.split('.')[0], table_column.split('.')[1]) for table_column in param_columns.values()]
 
-    if columns_dict is None:
-        return {}
+    # Récupérer les types de données des colonnes
+    column_types = get_column_data_types(connection, table_column_pairs)
 
-    # Extract parameters like $1, $2, etc.
-    parameters = sorted(set(re.findall(r"\$\d+", query)))
 
-    # Prepare table-column pairs for querying PostgreSQL
-    table_column_pairs = []
-    for context, columns in columns_dict.items():
-        for column in columns:
-            if '.' in column:  # Ensure the column is fully qualified (table.column)
-                table, col = column.split('.', 1)
-                table_column_pairs.append((table, col))
+    # Associer chaque paramètre SQL à son (table, colonne, data_type)
+    param_mapping = {}
+    for param, column in param_columns.items():
+        table_name, column_name = column.split('.')
+        column_key = (table_name, column_name)
 
-    # Query PostgreSQL to get column data types
-    column_data_types = get_column_data_types(connection, table_column_pairs)
+        # Vérifier si la clé est présente avec un schéma (ex: public.authors)
+        matching_key = next((key for key in column_types.keys() if key[1] == column_name and key[0].endswith(table_name)), None)
 
-    # Split the query into manageable fragments
-    query_fragments = split_query_by_parameters(query, parameters)
+        if matching_key:
+            column_type = column_types[matching_key]
+            resolved_table_name = matching_key[0]  # Utiliser le nom de la table avec schéma
+        else:
+            column_type = "UNKNOWN"
+            resolved_table_name = table_name
+            print(f"⚠️ Warning: Column {column_key} not found in column_types. Returning UNKNOWN.")
 
-    # Map parameters to their respective tables, columns, and types
-    parameter_mapping = {}
-    for param in parameters:
-        # Locate the parameter in the query fragments
-        for fragment in query_fragments:
-            if param in fragment:
-                
-                # Find the most relevant table and column for the parameter
-                best_match = None
-                for (full_table, column), data_type in column_data_types.items():
-                    schema, table = full_table.split('.')
-                    alias_variants = [f"{table}.{column}", f"{column}"]  # Add table.column and column formats
-                    for variant in alias_variants:
-                        if variant in fragment:
-                            
-                            # Prefer the first exact match
-                            best_match = (full_table, column, data_type)
-                            break
-                if best_match:
-                    parameter_mapping[param] = best_match
-                    break
-
-    return parameter_mapping
+        param_mapping[param] = (resolved_table_name, column_name, column_type)
+    return param_mapping
 
 
 def split_query_by_parameters(query, parameters):
@@ -233,9 +291,8 @@ def split_query_by_parameters(query, parameters):
 def get_genius_parameters (sql_query, session):
     conn, msg = database.connectdb(session)
     if "OK" in msg:
-        query=format_sql(sql_query)
         
-        parameter_mapping = map_query_parameters(query, conn)
+        parameter_mapping = map_query_parameters(sql_query, conn)
         
         return parameter_mapping
     return None

@@ -1,0 +1,186 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ config.ASSETS_ROOT }}/css/dataTables.dataTables.css">
+{% endblock stylesheets %}
+
+{% block content %}
+ 
+  <div class="py-4">
+      <div class="d-flex justify-content-between w-100 flex-wrap">
+          <div class="mb-3 mb-lg-0">
+              <h1 class="h4">{{ description['category'] }} / {{ description['description'] }}</h1>
+          </div>
+          {%if description['reference'] %}  
+                            
+          <a href="{{ description['reference'] }}" target="_blank">
+            Reference here : 
+    
+          <svg class="icon" fill="none" stroke="green" viewBox="0 0 24 24" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"></path>
+            </svg>
+          </a>
+          {% endif %}  
+          <div>
+            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#modal-default">Show query</button>
+          </div>
+          <!-- Refresh -->
+          <div>
+            <button id="refresh" type="submit" class="btn btn-info" name="submit_refresh" value="refresh" onclick="refreshPage()">
+                <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3"></path></svg>
+                    Refresh
+            </button>  
+          </div>
+        </div>          
+      </div>
+  </div>
+   <div class="modal fade" id="modal-default" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="h6 modal-title">Executed query</h2>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <code>{{ description['sql'] }}</code>
+              
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-link text-gray ms-auto" data-bs-dismiss="modal">Close</button>
+              </div>
+          </div>
+      </div></div>
+
+ 
+      <div class="btn-group">
+
+        <button onclick="location.href='/reset_pg_stat.html'" type="button" class="btn btn-danger d-inline-flex align-items-center">
+            <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0">
+            </path></svg>
+            Reset
+        </button>
+    </div>   
+
+  <div class="card border-0 shadow mb-4">
+      <div class="card-body">
+        <div class="table-responsive">
+            <table id="generic" class="table table-striped" style="width:100%" >
+                <thead class="thead-light">
+                    <tr>
+                        <th>Schema</th>
+                        <th>Table</th>
+                        <th>Table Hit Cache Ratio</th>
+                        <th>Index Hit Cache Ratio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        <td>{{ row['schemaname'] }}</td>
+                        <td>
+                            <a href="/topqueries.html?tablename={{ row['table_name'] | urlencode }}">
+                                {{ row['table_name'] }}
+                                    <svg class="icon icon-xs text-gray-500 me-2" viewBox="0 0 20 20" data-slot="icon" fill="none" stroke-width="1.5" stroke="blue" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6"></path>
+                                    </svg>
+                            </a>
+                        </td>
+                
+                        <!-- Vérification et affichage du table_cache_hit_ratio -->
+                        <td>
+                            {% if row['table_cache_hit_ratio'] is number %}
+                                {{ row['table_cache_hit_ratio'] }} %
+                                {% if row['table_cache_hit_ratio'] == 0 %}
+                                    ❓
+                                {% elif row['table_cache_hit_ratio'] >= 99 %}
+                                    ✅
+                                {% elif row['table_cache_hit_ratio'] >= 95 %}
+                                    👍
+                                {% elif row['table_cache_hit_ratio'] >= 90 %}
+                                    ⚠️
+                                {% else %}
+                                    ❌
+                                {% endif %}
+                            {% else %}
+                                <span class="text-danger">no values</span>
+                            {% endif %}
+                        </td>
+                
+                        <!-- Vérification et affichage du index_cache_hit_ratio -->
+                        <td>
+                            {% if row['index_cache_hit_ratio'] is number %}
+                                {{ row['index_cache_hit_ratio'] }} %
+                                {% if row['index_cache_hit_ratio'] == 0 %}
+                                    ❓
+                                {% elif row['index_cache_hit_ratio'] >= 99 %}
+                                    ✅
+                                {% elif row['index_cache_hit_ratio'] >= 95 %}
+                                    👍
+                                {% elif row['index_cache_hit_ratio'] >= 90 %}
+                                    ⚠️
+                                {% else %}
+                                    ❌
+                                {% endif %}
+                            {% else %}
+                                <span class="text-danger">no values</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+      </div>
+  </div>
+
+  <div class="card border-0 shadow mb-4">
+    <div class="card-body">
+        <h5 class="mb-3">📌 Understanding the Query Results: Analyzing Cache Hit Ratios in PostgreSQL</h5>
+        <ul class="list-group">
+            <li class="list-group-item"><strong>📂 Low Cache Hit Ratios = More Disk Reads<p>
+                A low table or index cache hit ratio means that PostgreSQL frequently reads from disk instead of memory, which slows down queries and increases I/O load.</p></li>
+            <li class="list-group-item"><strong>⏳ Indexes May Be Inefficient:</strong> If a table has a high table cache hit ratio but a low index cache hit ratio, it could mean:
+            <p>- Indexes are not properly used.</p>
+            <p>- Queries rely on sequential scans instead of index scans.</p>
+            <p>- Index bloat may be affecting efficiency.</p>
+            </li>
+            <li class="list-group-item"><strong>📈 Optimizing Performance</strong> : Identifying poorly cached tables allows database administrators to take actions such as:
+            <p>- Increasing shared_buffers to improve caching.</p>
+            <p>- Adding or optimizing indexes for better query performance.</p>
+            <p>- Rewriting queries to make better use of indexes.</p>
+            <p>- Using <a href="https://www.postgresql.org/docs/current/pgprewarm.html"> pg_prewarm</a> to preload frequently accessed tables into memory.</p>
+            </li>
+            <li class="list-group-item"><strong>🔄 Conclusion</strong> This query helps prioritize database optimization efforts by highlighting tables and indexes that rely too much on disk I/O. By improving cache efficiency, PostgreSQL can serve queries faster and reduce hardware strain.
+            </li>
+        </ul>
+    </div>
+  </div>
+
+  <p id="current-sql">No SQL executing</p>
+  <div id="results"></div>
+
+<script id="dt1" src="{{ config.ASSETS_ROOT }}/js/jquery-3.7.1.js" ></script>
+<script id="dt3" src="{{ config.ASSETS_ROOT }}/js/dataTables.js" ></script>
+
+<script>
+    function refreshPage() {
+            location.reload(); // Reloads the page
+        }
+</script>
+
+<script>
+    // Garde les colonnes triables mais désactive le tri par défaut
+    new DataTable('#generic', {
+      order: [] // Pas de tri initial
+    });
+</script>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
