@@ -166,5 +166,3 @@ def check_index_coverage(indexes_dict, used_columns_dict):
 
     return coverage_info
 
-# Analyze tables and columns used in conditions
-# table_conditions = analyze_table_conditions(sql_query)

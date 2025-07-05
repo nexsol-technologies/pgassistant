@@ -1,14 +1,12 @@
 import datetime
 import decimal
-import time
+import json
+import os
 import re
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import json
-import os
-import collections
+
 from flask import g
-from . import pgtune
 from . import sqlhelper
 
 PGA_QUERIES={}
@@ -30,6 +28,12 @@ def dict_merge(dct, merge_dct):
             dct[k] = merge_dct[k]
 
 def connectdb(db_config):
+    """
+    Establishes a connection to a PostgreSQL database using psycopg2.
+    
+    :param db_config: Dictionary containing database connection details.
+    :return: Connection object or None in case of failure, along with a status message.
+    """    
     try:
         con = psycopg2.connect(database=db_config["db_name"],
                             host=db_config["db_host"],
@@ -38,13 +42,19 @@ def connectdb(db_config):
                             port=db_config["db_port"],
                             connect_timeout=5,
                             application_name="pgAssistant")
-        #con.set_session(autocommit=True)
+    
         con.autocommit = True
     except psycopg2.Error as err:
         return None, format(err).rstrip()
     return con, "OK"
 
 def db_exec(conn, sql):
+    """
+    Executes a SQL statement that does not return a result (e.g., INSERT, UPDATE).
+    
+    :param conn: The active database connection.
+    :param sql: The SQL statement to execute.
+    """    
     conn.set_session(autocommit=True)
     cursor = conn.cursor()
     cursor.execute(sql)
@@ -69,32 +79,61 @@ def db_exec_recommandation(conn, sql):
         cursor.close()
 
 def get_json_cursor(conn):
+    """
+    Returns a database cursor that fetches results as a dictionary (JSON-like).
+    """    
     return conn.cursor(cursor_factory=RealDictCursor)
 
 def execute_and_fetch(cursor, query):
+    """
+    Executes a SQL query and fetches all results.
+    
+    :param cursor: The active database cursor.
+    :param query: The SQL query to execute.
+    :return: Fetched query results.
+    """    
     cursor.execute(query)
     res = cursor.fetchall()
     cursor.close()
     return res
 
 def get_json_response(conn, query):
+    """
+    Executes a SQL query and returns the result as a JSON string.
+    
+    :param conn: The active database connection.
+    :param query: The SQL query to execute.
+    :return: JSON string of the query results.
+    """    
     cursor = get_json_cursor(conn)
     response = execute_and_fetch(cursor, query)
     return json.dumps(response)
 
 def defaultconverter(o):
+    """
+    Converts datetime and decimal objects to strings for JSON serialization.
+    """    
     if isinstance(o, datetime.datetime):
         return o.__str__()
     elif isinstance(o, decimal.Decimal):
         return str(o)
     
 def db_fetch_json(conn,sql):
-    #Creating a cursor object using the cursor() method
+    """
+    Executes a SQL query and returns results as a JSON string with type conversion.
+    
+    :param conn: The active database connection.
+    :param sql: The SQL query to execute.
+    :return: JSON string containing the query results.
+    """
     cursor = get_json_cursor(conn)
     response = execute_and_fetch(cursor, sql)
     return json.dumps(response, default = defaultconverter)
 
 def get_top_queries(db_config):
+    """
+    Retrieves the top queries executed in the database.
+    """    
     rows = []
     con, message = connectdb(db_config)
     if con:
@@ -106,6 +145,9 @@ def get_top_queries(db_config):
     return rows
 
 def get_rank_queries(db_config):
+    """
+    Retrieves ranked database queries.
+    """    
     rows = [] 
     con, message = connectdb(db_config)
     if con:
@@ -117,6 +159,9 @@ def get_rank_queries(db_config):
     return rows
 
 def exec_cmd(db_config,query_id):
+    """
+    Executes a predefined query by its ID.
+    """    
     con, message = connectdb(db_config)
     if con:
        db_query(con,query_id)
@@ -269,6 +314,12 @@ def get_queries():
             PGA_QUERIES['sql']=PGA_QUERIES['sql']+userqueries['sql']
             
 def get_pg_tune_parameter(db_config):
+    """
+    Retrieves PostgreSQL tuning parameters and version.
+    
+    :param db_config: Database configuration dictionary.
+    :return: Dictionary of tuning parameters and major version.
+    """    
     con, message = connectdb(db_config)
     if con:
         # get the the current setting of key pgtune run-time parameters.
@@ -300,9 +351,10 @@ def get_pg_tune_parameter(db_config):
 
 def get_existing_indexes(db_config):
     """
-    get existing indexes from PostgreSQL.
-
-    :return: Dictionnary {table_name: set(frozenset(columns))}
+    Retrieves existing indexes from PostgreSQL.
+    
+    :param db_config: Database configuration dictionary.
+    :return: Dictionary {table_name: set(frozenset(columns))} of existing indexes.
     """
     existing_indexes = {}
     try:

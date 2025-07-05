@@ -8,6 +8,12 @@ from . import analyze_param
 import json
 
 def get_tables(query):
+    """
+    Extracts table names from an SQL query.
+
+    :param query: The SQL query as a string.
+    :return: A list of table names used in the query. Returns an empty list if extraction fails.
+    """    
     try:
         tables = Parser(query.lower()).tables
         return tables
@@ -29,6 +35,12 @@ def get_sql_type(sql_query):
         return "unknown"
 
 def get_formated_sql(sql_query):
+    """
+    Formats an SQL query for better readability.
+
+    :param sql_query: The raw SQL query as a string.
+    :return: The formatted SQL query if formatting succeeds, otherwise returns the original query.
+    """    
     try:
         sqlf = format_sql(sql_query)
         return sqlf
@@ -290,10 +302,8 @@ def split_query_by_parameters(query, parameters):
 
 def get_genius_parameters (sql_query, session):
     conn, msg = database.connectdb(session)
-    if "OK" in msg:
-        
-        parameter_mapping = map_query_parameters(sql_query, conn)
-        
+    if "OK" in msg:     
+        parameter_mapping = map_query_parameters(sql_query, conn)   
         return parameter_mapping
     return None
 

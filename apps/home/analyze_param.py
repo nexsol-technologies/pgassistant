@@ -3,17 +3,17 @@ from sqlglot.expressions import Column, Binary, Literal, And, Or, EQ, GT, LT, Li
 
 def extract_binary_conditions(expression):
     """
-    Fonction récursive pour extraire toutes les conditions binaires (=, >, <, IN, LIKE, etc.).
+    Recursive function to extract all binary conditions (=, >, <, IN, LIKE, etc.).
     
-    :param expression: Noeud de l'AST SQLGlot
-    :return: Liste des conditions binaires trouvées
+    :param expression: AST node from SQLGlot
+    :return: List of found binary conditions
     """
     conditions = []
 
-    if isinstance(expression, (EQ, GT, LT, In, Like)):  # Comparaisons =, >, <, IN, LIKE
+    if isinstance(expression, (EQ, GT, LT, In, Like)):  # Comparisons =, >, <, IN, LIKE
         conditions.append(expression)
     
-    elif isinstance(expression, (And, Or, Subquery, Select)):  # Si c'est un AND/OR/Sous-requête, on explore ses sous-expressions
+    elif isinstance(expression, (And, Or, Subquery, Select)):  # If it's an AND/OR/Subquery, explore its sub-expressions
         left_expr = expression.args.get("this")
         right_expr = expression.args.get("expression")
 
@@ -27,18 +27,18 @@ def extract_binary_conditions(expression):
 
 def extract_table_aliases(expression):
     """
-    Récupère les alias de table définis dans la clause FROM et les JOIN.
+    Retrieves table aliases defined in the FROM clause and JOINs.
 
-    :param expression: L'expression AST de SQLGlot
-    :return: Dictionnaire {alias: vrai_nom_de_la_table}
+    :param expression: AST expression from SQLGlot
+    :return: Dictionary {alias: actual_table_name}
     """
     aliases = {}
 
-    # Trouver toutes les tables dans FROM et JOIN
+    # Find all tables in FROM and JOIN
     for table in expression.find_all(Table):
         table_name = table.name
         alias = table.alias_or_name
-        if alias:  # Si la table a un alias, on l'ajoute
+        if alias:  # If the table has an alias, add it
             aliases[alias] = table_name
 
     return aliases
@@ -46,40 +46,40 @@ def extract_table_aliases(expression):
 
 def find_table_for_column(column, table_aliases, default_table):
     """
-    Trouve la table associée à une colonne en remplaçant les alias.
+    Finds the table associated with a column by replacing aliases.
 
-    :param column: L'objet Column de SQLGlot
-    :param table_aliases: Dictionnaire des alias de tables
-    :param default_table: Nom de la table par défaut
-    :return: Nom de la table associée
+    :param column: SQLGlot Column object
+    :param table_aliases: Dictionary of table aliases
+    :param default_table: Default table name
+    :return: Associated table name
     """
     if column.table:
-        table_name = table_aliases.get(column.table, column.table)  # Remplacer l'alias par le vrai nom
+        table_name = table_aliases.get(column.table, column.table)  # Replace alias with actual name
         return table_name
     return default_table
 
 
 def extract_parameter_columns(sql_query):
     """
-    Parse une requête SQL et renvoie un mapping des paramètres ($1, $2, etc.) vers les colonnes utilisées.
+    Parses an SQL query and returns a mapping of parameters ($1, $2, etc.) to the used columns.
 
-    :param sql_query: Requête SQL sous forme de chaîne
-    :return: Dictionnaire {paramètre: table.colonne}
+    :param sql_query: SQL query as a string
+    :return: Dictionary {parameter: table.column}
     """
-    # Parser la requête SQL avec sqlglot
+    # Parse the SQL query with sqlglot
     expression = sqlglot.parse_one(sql_query, dialect="postgres")
 
     param_columns = {}
 
-    # Récupérer les alias de table
+    # Retrieve table aliases
     table_aliases = extract_table_aliases(expression)
 
-    # Récupérer toutes les clauses WHERE (incluant celles dans les sous-requêtes)
+    # Retrieve all WHERE clauses (including those in subqueries)
     where_clauses = expression.find_all(sqlglot.expressions.Where)
 
     for where_clause in where_clauses:
 
-        # Trouver la table utilisée dans cette clause WHERE (pour gérer les sous-requêtes)
+        # Find the table used in this WHERE clause (to handle subqueries)
         parent_select = where_clause.find_ancestor(Select)
         if parent_select:
             subquery_table_aliases = extract_table_aliases(parent_select)
@@ -88,7 +88,7 @@ def extract_parameter_columns(sql_query):
             subquery_table_aliases = table_aliases
             default_table = next(iter(table_aliases.values()), None)
 
-        # Extraire toutes les conditions binaires (y compris celles dans des sous-requêtes)
+        # Extract all binary conditions (including those in subqueries)
         conditions = extract_binary_conditions(where_clause.this)
 
         for condition in conditions:
@@ -97,17 +97,17 @@ def extract_parameter_columns(sql_query):
             if left is None or right is None:
                 continue
 
-            # Vérifier si `right` est un paramètre (avec un `Literal` dedans)
+            # Check if `right` is a parameter (with a `Literal` inside)
             if isinstance(left, Column) and isinstance(right, Parameter) and isinstance(right.this, Literal):
-                param_key = str(right.this.this)  # Extraire le numéro du paramètre
-                column_table = find_table_for_column(left, table_aliases, default_table)  # Appliquer les alias
+                param_key = str(right.this.this)  # Extract the parameter number
+                column_table = find_table_for_column(left, table_aliases, default_table)  # Apply aliases
                 column_name = left.name
                 full_column_name = f"{column_table}.{column_name}"
                 
                 param_columns[param_key] = full_column_name
             elif isinstance(right, Column) and isinstance(left, Parameter) and isinstance(left.this, Literal):
-                param_key = str(left.this.this)  # Extraire le numéro du paramètre
-                column_table = find_table_for_column(right, table_aliases, default_table)  # Appliquer les alias
+                param_key = str(left.this.this)  # Extract the parameter number
+                column_table = find_table_for_column(right, table_aliases, default_table)  # Apply aliases
                 column_name = right.name
                 full_column_name = f"{column_table}.{column_name}"
                 param_columns[param_key] = full_column_name

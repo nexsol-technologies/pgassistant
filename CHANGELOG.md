@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.9.1] - 2025-06-30
+- Upgrading to alpine 3.22
+- Code comments
+
+
 ## [1.9] - 2025-02-28
 ### Features
 - Analyze query, analyze parameter query with sqlglot : gives good results now.

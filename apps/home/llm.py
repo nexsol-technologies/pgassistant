@@ -1,10 +1,16 @@
+import os
 from openai import OpenAI
 from .ddl import generate_tables_ddl
 from .sqlhelper import get_tables
-import os
 import markdown
 
 def query_chatgpt(question):
+    """
+    Sends a question to ChatGPT (or a local LLM) and returns the response.
+
+    :param question: The user's question to send to the LLM.
+    :return: Formatted Markdown response from the model.
+    """    
     api_key=os.environ.get('OPENAI_API_KEY', None)
     project=os.environ.get('OPENAI_API_PROJECT', None)
     
@@ -37,28 +43,46 @@ def query_chatgpt(question):
     return(markdown.markdown(completion.choices[0].message.content,extensions=["fenced_code", "codehilite", "extra"]))
 
 def get_llm_query_for_query_analyze (host, port, database, user, password, sql_query, rows):
+    """
+    Generates a detailed prompt for an LLM to analyze and optimize a PostgreSQL query.
+
+    :param host: The database host.
+    :param port: The database port.
+    :param database: The database name.
+    :param user: The database user.
+    :param password: The database password.
+    :param sql_query: The SQL query with `EXPLAIN ANALYZE` prefix.
+    :param rows: The output of `EXPLAIN ANALYZE` as a list of dictionaries.
+    :return: A formatted string containing query details for LLM analysis.
+    """    
     query = sql_query.replace ("EXPLAIN ANALYZE  ", "")
     tables = get_tables(query)
     
+    # Generate the DDL (schema) of the involved tables
     ddl = generate_tables_ddl(host, port, database, user, password, tables)
 
+    # Construct the LLM prompt with structured details
     llm = (
         "I have a PostgreSQL query that I would like to optimize. Below, I have provided the necessary details:\n\n"
-        f"1. **DDL of the table(s) involved**:\n```sql\n{ddl}```\n\n"
-        f"2. **The SQL query**:\n```sql\n{sql_query}```\n\n"
+        f"1. **DDL of the table(s) involved**:\n```sql\n{ddl}\n```\n\n"
+        f"2. **The SQL query**:\n```sql\n{sql_query}\n```\n\n"
         "3. **`EXPLAIN ANALYZE` output**:\n\n```"
     )
     llm += "\n".join(row['QUERY PLAN'] for row in rows)
-    llm += "```\n"
+    llm += "\n```\n"
+    
+    # Add the optimization request
     llm += (
     "\nCould you analyze this query and suggest optimizations? If optimizations are possible, please provide the necessary SQL statements "
     "(e.g., additional indexes or query rewrites) and explain the reasoning behind your recommendations."
     )
+    # Add a cautionary note about redundant index recommendations
     llm += (
     "\n\n**Important Notice:** When suggesting optimizations, especially related to indexes, please carefully review the DDL provided above. "
     "Some indexes may already exist, and redundant or unnecessary index recommendations should be avoided. Ensure any suggested indexes align "
     "with the schema and constraints defined in the DDL. Never forget that primary keys are always indexed."
     )
+    # Encourage careful and well-supported recommendations
     llm += (
     "\nFeel free to reflect on possible optimizations and reasoning before finalizing your response. Ensure all suggestions are well-supported "
     "and avoid any unnecessary or redundant recommendations."

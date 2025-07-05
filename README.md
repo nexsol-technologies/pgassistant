@@ -96,7 +96,7 @@ The JSON format is very simple :
 Use this [docker-compse.yml](docker-compose/docker-compose.yml) and run :
 
 ```bash
-$ docker-compose up 
+$ docker compose up 
 ```
 
 Visit `http://localhost:8080/database.html` in your browser. The app should be up & running.
