@@ -23,7 +23,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            nexsoltech/pgassistant:1.9
+            nexsoltech/pgassistant:1.9.1
             nexsoltech/pgassistant:latest
           platforms: linux/amd64,linux/arm64
           no-cache: true

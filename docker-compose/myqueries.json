@@ -2,18 +2,10 @@
     "sql":
     [
             {
-                "id": "search a firstname",
-                "description": "search a firstname",
-                "category": "Database",        
-                "sql": "select * from firstname where firstname like '$1%';",
-                "type": "param_query",
-                "reference": "https://www.postgresql.org/docs/current/sql-show.html"
-            },
-            {
                 "id": "vacuum_opt",
-                "description": "Vacuum statistics",
-                "category": "Database",
-                "sql": "WITH fk_indexes AS (\n    SELECT \n        n.nspname AS schema_name,\n        ci.relname AS index_name,\n        cr.relname AS table_name,\n        (confrelid::regclass)::text AS fk_table_ref,\n        array_to_string(indclass, ', ') AS opclasses\n    FROM pg_index i\n    JOIN pg_class ci ON ci.oid = i.indexrelid AND ci.relkind = 'i'\n    JOIN pg_class cr ON cr.oid = i.indrelid AND cr.relkind = 'r'\n    JOIN pg_namespace n ON n.oid = ci.relnamespace\n    JOIN pg_constraint cn ON cn.conrelid = cr.oid\n    LEFT JOIN pg_stat_user_indexes si ON si.indexrelid = i.indexrelid\n    WHERE contype = 'f' \n      AND i.indisunique IS FALSE\n      AND conkey IS NOT NULL\n      AND ci.relpages > 0\n      AND si.idx_scan < 10\n),\nindex_data AS (\n    SELECT \n        *,\n        (SELECT string_agg(lpad(i, 3, '0'), ' ') FROM unnest(string_to_array(indkey::text, ' ')) i) AS columns,\n        array_to_string(indclass, ', ') AS opclasses\n    FROM pg_index i\n    JOIN pg_class ci ON ci.oid = i.indexrelid AND ci.relkind = 'i'\n    WHERE indisvalid = TRUE \n      AND ci.relpages > 0\n),\nredundant_indexes AS (\n    SELECT \n        i2.indexrelid AS index_id,\n        tnsp.nspname AS schema_name,\n        trel.relname AS table_name,\n        pg_relation_size(trel.oid) AS table_size_bytes,\n        irel.relname AS index_name,\n        am1.amname AS access_method,\n        (i1.indexrelid::regclass)::text AS reason,\n        i1.indexrelid AS reason_index_id,\n        pg_get_indexdef(i1.indexrelid) AS main_index_def,\n        pg_size_pretty(pg_relation_size(i1.indexrelid)) AS main_index_size,\n        pg_get_indexdef(i2.indexrelid) AS index_def,\n        pg_relation_size(i2.indexrelid) AS index_size_bytes,\n        s.idx_scan AS index_usage,\n        quote_ident(tnsp.nspname) AS formated_schema_name,\n        COALESCE(NULLIF(quote_ident(tnsp.nspname), 'public') || '.', '') || quote_ident(irel.relname) AS formated_index_name,\n        quote_ident(trel.relname) AS formated_table_name,\n        COALESCE(NULLIF(quote_ident(tnsp.nspname), 'public') || '.', '') || quote_ident(trel.relname) AS formated_relation_name,\n        i2.opclasses\n    FROM index_data AS i1\n    JOIN index_data AS i2 ON (\n        i1.indrelid = i2.indrelid \n        AND i1.indexrelid <> i2.indexrelid\n    )\n    INNER JOIN pg_opclass op1 ON i1.indclass[0] = op1.oid\n    INNER JOIN pg_opclass op2 ON i2.indclass[0] = op2.oid\n    INNER JOIN pg_am am1 ON op1.opcmethod = am1.oid\n    INNER JOIN pg_am am2 ON op2.opcmethod = am2.oid\n    JOIN pg_stat_user_indexes AS s ON s.indexrelid = i2.indexrelid\n    JOIN pg_class AS trel ON trel.oid = i2.indrelid\n    JOIN pg_namespace AS tnsp ON trel.relnamespace = tnsp.oid\n    JOIN pg_class AS irel ON irel.oid = i2.indexrelid\n    WHERE NOT i2.indisprimary\n      AND NOT (i2.indisunique AND NOT i1.indisprimary)\n      AND am1.amname = am2.amname\n      AND i1.columns LIKE (i2.columns || '%')\n      AND i1.opclasses LIKE (i2.opclasses || '%')\n      AND pg_get_expr(i1.indexprs, i1.indrelid) IS NOT DISTINCT FROM pg_get_expr(i2.indexprs, i2.indrelid)\n      AND pg_get_expr(i1.indpred, i1.indrelid) IS NOT DISTINCT FROM pg_get_expr(i2.indpred, i2.indrelid)\n),\nredundant_indexes_fk AS (\n    SELECT \n        ri.*, \n        (SELECT COUNT(1) \n         FROM fk_indexes fi \n         WHERE fi.fk_table_ref = ri.table_name \n           AND fi.opclasses LIKE (ri.opclasses || '%')) > 0 AS supports_fk\n    FROM redundant_indexes ri\n),\nredundant_indexes_tmp_num AS (\n    SELECT \n        ROW_NUMBER() OVER () num, \n        rig.* \n    FROM redundant_indexes_fk rig \n    ORDER BY index_id\n),\nredundant_indexes_tmp_cut AS (\n    SELECT \n        ri1.*, \n        ri2.num AS r_num \n    FROM redundant_indexes_tmp_num ri1\n    LEFT JOIN redundant_indexes_tmp_num ri2 ON ri2.reason_index_id = ri1.index_id \n        AND ri1.reason_index_id = ri2.index_id\n    WHERE ri1.num < ri2.num OR ri2.num IS NULL\n),\nredundant_indexes_cut_grouped AS (\n    SELECT \n        DISTINCT(num), \n        * \n    FROM redundant_indexes_tmp_cut \n    ORDER BY index_size_bytes DESC\n),\nredundant_indexes_grouped AS (\n    SELECT \n        DISTINCT(num), \n        * \n    FROM redundant_indexes_tmp_cut \n    ORDER BY index_size_bytes DESC\n)\nSELECT \n    schema_name,\n    table_name,\n    table_size_bytes,\n    index_name,\n    access_method,\n    STRING_AGG(DISTINCT reason, ', ') AS redundant_to,\n    STRING_AGG(main_index_def, ', ') AS main_index_def,\n    STRING_AGG(main_index_size, ', ') AS main_index_size,\n    index_def,\n    index_size_bytes,\n    index_usage,\n    supports_fk,\n    -- Generate DROP INDEX SQL\n    CASE \n        WHEN index_usage < 10 AND NOT supports_fk THEN \n            'DROP INDEX ' || \n            COALESCE(NULLIF(quote_ident(schema_name), 'public') || '.', '') || \n            quote_ident(index_name) || '; ANALYZE ' || schema_name || '.' || table_name || ';' \n        ELSE '-- NO RECOMMANDATION'\n    END AS pga_suggestion\nFROM \n    redundant_indexes_cut_grouped\nGROUP BY \n    index_id, schema_name, table_name, table_size_bytes, index_name, access_method, index_def, index_size_bytes, index_usage, supports_fk\nORDER BY \n    index_size_bytes DESC;",
+                "description": "Vacuum analyze each table in the database",
+                "category": "Vacuum",
+                "sql": "SELECT n.nspname || '.' || c.relname AS table_name, s.n_live_tup AS live_tuples, s.n_dead_tup, s.n_tup_upd, pg_size_pretty(pg_total_relation_size(c.oid)) AS table_size, s.last_vacuum, s.last_autovacuum, s.last_analyze, s.last_autoanalyze, 'VACUUM ANALYZE ' || n.nspname || '.' || c.relname || ';' AS pga_suggestion FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace LEFT JOIN pg_stat_all_tables s ON s.relid = c.oid WHERE c.relkind = 'r' AND n.nspname NOT IN ('pg_catalog', 'information_schema') ORDER BY n.nspname, c.relname;",
                 "type": "select",
                 "reference": ""
                 
@@ -25,6 +17,62 @@
                 "sql": "SELECT grantee, privilege_type FROM information_schema.role_routine_grants WHERE routine_name = 'pg_stat_statements_reset';",
                 "type": "select",
                 "reference": ""
+            },
+              {
+                "id": "show_wal_level",
+                "description": "Show the current WAL level configuration",
+                "category": "DatabaseWal",
+                "sql": "SHOW wal_level;",
+                "type": "select",
+                "reference": "https://www.postgresql.org/docs/current/runtime-config-wal.html"
+            },
+            {
+                "id": "check_wal_archive_mode",
+                "description": "Check if WAL archiving is enabled",
+                "category": "DatabaseWal",
+                "sql": "SHOW archive_mode;",
+                "type": "select",
+                "reference": "https://www.postgresql.org/docs/current/runtime-config-wal.html"
+            },
+            {
+                "id": "get_last_wal_insert_lsn",
+                "description": "Get the last WAL insert location",
+                "category": "DatabaseWal",
+                "sql": "SELECT pg_current_wal_lsn();",
+                "type": "select",
+                "reference": "https://www.postgresql.org/docs/current/functions-admin.html"
+            },
+            {
+                "id": "get_wal_file_name",
+                "description": "Get WAL file name from a given LSN",
+                "category": "DatabaseWal",
+                "sql": "SELECT pg_walfile_name('$1');",
+                "type": "param_query",
+                "reference": "https://www.postgresql.org/docs/current/functions-admin.html"
+            },
+            {
+                "id": "get_replication_slots",
+                "description": "List all replication slots and their status",
+                "category": "DatabaseWal",
+                "sql": "SELECT * FROM pg_replication_slots;",
+                "type": "select",
+                "reference": "https://www.postgresql.org/docs/current/catalog-pg-replication-slots.html"
+            },
+            {
+                "id": "get_wal_receiver_status",
+                "description": "Check status of WAL receiver",
+                "category": "DatabaseWal",
+                "sql": "SELECT * FROM pg_stat_wal_receiver;",
+                "type": "select",
+                "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html"
+            },
+            {
+                "id": "get_archived_wal",
+                "description": "Check archived WAL files",
+                "category": "DatabaseWal",
+                "sql": "SELECT * FROM pg_stat_archiver;",
+                "type": "select",
+                "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html"
             }
             
     ]
