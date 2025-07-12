@@ -1,19 +1,30 @@
 import sqlglot
-from sqlglot.expressions import Column, Binary, Literal, And, Or, EQ, GT, LT, Like, Parameter, Table, Select, From, Subquery, In
+from sqlglot.expressions import Column, Binary, Literal, And, Or, EQ, GT, LT, Like, Parameter, Table, Select, From, Subquery, In,Paren, GTE, LTE, NEQ
+
 
 def extract_binary_conditions(expression):
     """
-    Recursive function to extract all binary conditions (=, >, <, IN, LIKE, etc.).
-    
+    Recursive function to extract all binary conditions (=, >, <, IN, LIKE, etc.),
+    including those wrapped in parentheses.
+
     :param expression: AST node from SQLGlot
     :return: List of found binary conditions
     """
     conditions = []
 
-    if isinstance(expression, (EQ, GT, LT, In, Like)):  # Comparisons =, >, <, IN, LIKE
+    if expression is None:
+        return conditions
+
+    # Base case: it's a binary condition
+    if isinstance(expression, (EQ, GT, LT, GTE, LTE, NEQ, In, Like)):
         conditions.append(expression)
-    
-    elif isinstance(expression, (And, Or, Subquery, Select)):  # If it's an AND/OR/Subquery, explore its sub-expressions
+
+    # Handle parentheses (e.g. WHERE (a = $1 AND b = $2))
+    elif isinstance(expression, Paren):
+        conditions.extend(extract_binary_conditions(expression.this))
+
+    # Handle logical combinations and subqueries
+    elif isinstance(expression, (And, Or, Subquery, Select)):
         left_expr = expression.args.get("this")
         right_expr = expression.args.get("expression")
 

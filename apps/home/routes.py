@@ -3,6 +3,7 @@
 Main routes
 """
 import traceback
+import os
 from apps.home import blueprint
 from flask import render_template, request, session,redirect, jsonify
 from jinja2 import TemplateNotFound
@@ -385,6 +386,15 @@ def fetch_column_data_route():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@blueprint.route('/api/v1/llm_get_models', methods=['GET'])
+def llm_get_models():
+    """
+    Flask route to fetch available LLM models.
+    """
+    models = llm.list_available_models()
+    return jsonify({"models": models})
+
+
 
 @blueprint.route('/<template>', methods=['GET', 'POST'])
 def route_template(template: str):
@@ -427,6 +437,17 @@ def route_template(template: str):
             return handle_table_rfc_get(template, segment)
         elif segment == "cache_table.html" and request.method == 'GET':
             return handle_cache_table_get(template, segment)
+        elif segment == "llm.html" and request.method == 'GET':
+            return render_template(f"home/{template}", segment=segment, llm_uri=os.environ.get("LOCAL_LLM_URI", ""), llm_api_key=os.environ.get("OPENAI_API_KEY", ""), llm_model=os.environ.get("OPENAI_API_MODEL", ""))
+        elif segment == "llm.html" and request.method == 'POST':
+            llm_uri = request.form.get("llm_uri")
+            llm_api_key = request.form.get("llm_api_key")
+            llm_model = request.form.get("llm_model")
+
+            os.environ["LOCAL_LLM_URI"] = llm_uri
+            os.environ["OPENAI_API_KEY"] = llm_api_key
+            os.environ["OPENAI_API_MODEL"] = llm_model
+            return render_template(f"home/{template}", segment=segment, llm_uri=llm_uri, llm_api_key=llm_api_key, llm_model=llm_model)
         return render_template(f"home/{template}", segment=segment, dbinfo={})
     except TemplateNotFound:
         return render_template('home/page-404.html'), 404

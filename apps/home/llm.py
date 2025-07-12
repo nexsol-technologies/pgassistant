@@ -12,8 +12,7 @@ def query_chatgpt(question):
     :return: Formatted Markdown response from the model.
     """    
     api_key=os.environ.get('OPENAI_API_KEY', None)
-    project=os.environ.get('OPENAI_API_PROJECT', None)
-    
+        
     local_llm=os.environ.get('LOCAL_LLM_URI', None)
     model_llm=os.environ.get('OPENAI_API_MODEL', None)
 
@@ -22,10 +21,10 @@ def query_chatgpt(question):
 
     # Using local LLM
     if (local_llm):
-        client = OpenAI(api_key=api_key, project=project,base_url = local_llm)
+        client = OpenAI(api_key=api_key, base_url = local_llm)
     # Using OpenAI
     else:
-        client = OpenAI(api_key=api_key, project=project)
+        client = OpenAI(api_key=api_key)
 
     completion = client.chat.completions.create(
         model=model_llm,
@@ -182,3 +181,28 @@ def get_llm_query_for_query_optimize (sql_query):
         f"{sql_query}\n"
     )
     return llm
+
+def list_available_models():
+    """
+    Returns a list of available models from the OpenAI API or a compatible API (like Ollama).
+    - Uses OPENAI_API_KEY if available.
+    - Otherwise, uses LOCAL_LLM_URI with a dummy 'none' API key.
+    """
+    api_key = os.getenv("OPENAI_API_KEY")
+    base_url = os.getenv("LOCAL_LLM_URI")
+
+    if not api_key and not base_url:
+        raise ValueError("Neither OPENAI_API_KEY nor LOCAL_LLM_URI is set.")
+
+    # Initialize the OpenAI client
+    client = OpenAI(
+        api_key=api_key or "none",  # "none" works for Ollama or APIs without authentication
+        base_url=base_url or "https://api.openai.com/v1"
+    )
+
+    try:
+        models = client.models.list()
+        return [model.id for model in models.data]
+    except Exception as e:
+        print(f"❌ Error fetching models: {e}")
+        return []

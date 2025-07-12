@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.9.2] - 2025-07-12
+### Bug Fixes
+- Parenthesis are not well interpreted when analyzing a query
+- Upgrade node-sass package : security advisor
+### Features
+- Add a new form to edit LLM settings (URI, models and api key)
+
 ## [1.9.1] - 2025-06-30
 - Upgrading to alpine 3.22
 - Code comments

@@ -32,7 +32,8 @@
                         <div class="col-sm-3 mb-3">
                             <div>
                                 <label for="db_port">Port</label>
-                                <input class="form-control" value="{{ session['db_port'] }}" id="db_port" name="db_port" type="number" placeholder="DB port" required>
+                                
+                                <input class="form-control w-auto" maxlength="8" value="{{ session['db_port'] }}" id="db_port" name="db_port" type="number" placeholder="DB port" required>
                             </div>
                         </div>
                     </div>
@@ -56,7 +57,9 @@
                                 <label for="db_password">Password</label>
                                 <input class="form-control" value="{{ session['db_password'] }}" id="db_password" name="db_password" type="password" placeholder="Enter user password" required/>
                             </div>
-                        </div>                        
+                        </div>
+                        </div>
+                                                                   
                     </div>
                     
                         <label for="db_info">{{ dbinfo['error'] }}</label>

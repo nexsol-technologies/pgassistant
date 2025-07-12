@@ -48,7 +48,7 @@
         "gulp-autoprefixer": "^8.0.0",
         "gulp-clean-css": "^4.3.0",
         "gulp-cssbeautify": "^3.0.0",
-        "node-sass": "^6.0.1",
+        "node-sass": "^7.0.0",
         "gulp-file-include": "^2.3.0",
         "gulp-header": "^2.0.9",
         "gulp-htmlmin": "^5.0.1",
