@@ -78,8 +78,11 @@ def extract_parameter_columns(sql_query):
     :return: Dictionary {parameter: table.column}
     """
     # Parse the SQL query with sqlglot
-    expression = sqlglot.parse_one(sql_query, dialect="postgres")
-
+    try:
+        expression = sqlglot.parse_one(sql_query, dialect="postgres")
+    except sqlglot.errors.ParseError as e:
+        return {}
+    
     param_columns = {}
 
     # Retrieve table aliases

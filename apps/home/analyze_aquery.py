@@ -98,21 +98,14 @@ def analyze_table_conditions(sql_query):
     # Retrieve columns used in conditions (WHERE, JOIN ON, etc.)
     condition_columns = extract_columns_from_conditions(expression)
 
-    # Retrieve columns used exclusively in SELECT
-    select_columns = extract_columns_from_select(expression)
-
-    # Exclude columns used **only** in `SELECT` and not in `WHERE` or `JOIN`
-    columns_used_only_in_select = select_columns - condition_columns
-
-    # Identify columns actually used for conditions
-    relevant_columns = condition_columns  # Do not remove columns that are also in JOIN or WHERE
-
     # Build a dictionary table -> columns
     table_columns = {table: [] for table in tables}
 
-    for table, column in relevant_columns:
-        # Replace the alias with the actual table name
-        resolved_table = table_aliases.get(table, table)
+    for table, column in condition_columns:
+        if not table and len(tables) == 1:
+            resolved_table = list(tables)[0]
+        else:
+            resolved_table = table_aliases.get(table, table)
 
         if resolved_table in table_columns:
             table_columns[resolved_table].append(column)

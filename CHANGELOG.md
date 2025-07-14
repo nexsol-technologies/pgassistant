@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.9.3] - 2025-07-14
+### Bug Fixes
+- On very simple queries, Sqlglot cannot determine which table a column corresponds to
+- Some sql queries cause sqlglot to crash during parsing (mainly when using DATE expressions)
+
 ## [1.9.2] - 2025-07-12
 ### Bug Fixes
 - Parenthesis are not well interpreted when analyzing a query

@@ -320,8 +320,6 @@ def analyze_query(querid):
                     existing_indexes = database.get_existing_indexes(session)
                     analyzed_query = analyze_aquery.analyze_table_conditions(sql_query)
                     tables_and_columns =  analyze_aquery.check_index_coverage(existing_indexes,analyzed_query)
-                    
-
                 elif request.form.get('action')=='optimize':
                     question_optimize=llm.get_llm_query_for_query_optimize(sql_query)
                     chatgpt_response=llm.query_chatgpt(question_optimize)
