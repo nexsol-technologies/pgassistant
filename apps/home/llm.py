@@ -3,6 +3,12 @@ from openai import OpenAI
 from .ddl import generate_tables_ddl
 from .sqlhelper import get_tables
 import markdown
+import re
+
+def fix_code_blocks(text):
+    # Ajoute un saut de ligne avant chaque bloc ```lang s’il n’y en a pas déjà un
+    text = re.sub(r'([^\n])(```\w+)', r'\1\n\2', text)
+    return text
 
 def query_chatgpt(question):
     """
@@ -39,7 +45,23 @@ def query_chatgpt(question):
         n=1  
     )
 
-    return(markdown.markdown(completion.choices[0].message.content,extensions=["fenced_code", "codehilite", "extra"]))
+    #return(markdown.markdown(completion.choices[0].message.content,extensions=["fenced_code", "codehilite", "extra"]))
+
+    md_text = fix_code_blocks(completion.choices[0].message.content)
+    print (f"LLM response: {completion.choices[0].message.content}")
+
+    html = markdown.markdown(
+        md_text,
+        extensions=["fenced_code", "codehilite", "extra"],
+        extension_configs={
+            "codehilite": {
+                "guess_lang": False,
+                "css_class": "highlight"
+            }
+        },
+        output_format="html5"
+    )
+    return html
 
 def get_llm_query_for_query_analyze (host, port, database, user, password, sql_query, rows):
     """

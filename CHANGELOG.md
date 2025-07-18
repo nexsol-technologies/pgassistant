@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.9.4] - 2025-07-18
+
+### Bug Fixes
+- Top 50 queries were not working correctly with PostgreSQL v17
+
+### Features
+- Removed unnecessary SQL code from `pg_dump` output
+- Refactored LLM response rendering in HTML5 with code copy functionality
+
 ## [1.9.3] - 2025-07-14
 ### Bug Fixes
 - On very simple queries, Sqlglot cannot determine which table a column corresponds to
@@ -10,7 +19,7 @@
 - Parenthesis are not well interpreted when analyzing a query
 - Upgrade node-sass package : security advisor
 ### Features
-- Add a new form to edit LLM settings (URI, models and api key)
+- Add a new form to edit [LLM settings](media/llm_settings.png) (URI, models and api key)
 
 ## [1.9.1] - 2025-06-30
 - Upgrading to alpine 3.22

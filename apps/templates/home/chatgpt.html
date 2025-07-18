@@ -3,7 +3,31 @@
 {% block title %} Settings {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<link type="text/css" href="{{ config.ASSETS_ROOT }}/css/pygment.css" rel="stylesheet">
+<style>
+.code-wrapper {
+  position: relative;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+.copy-btn:hover {
+  opacity: 1;
+}
+</style>
+{% endblock stylesheets %}
 
 {% block content %}
 
@@ -24,4 +48,29 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('pre code').forEach(function (codeBlock) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-wrapper';
+    codeBlock.parentNode.parentNode.insertBefore(wrapper, codeBlock.parentNode);
+    wrapper.appendChild(codeBlock.parentNode);
+
+    const button = document.createElement('button');
+    button.className = 'copy-btn';
+    button.textContent = 'Copy';
+
+    button.addEventListener('click', () => {
+      const code = codeBlock.innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        button.textContent = 'Copied!';
+        setTimeout(() => (button.textContent = 'Copy'), 1500);
+      });
+    });
+
+    wrapper.appendChild(button);
+  });
+});
+</script>
+{% endblock javascripts %}

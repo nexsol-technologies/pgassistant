@@ -33,19 +33,32 @@ def remove_pg_catalog_lines(sql_script):
     cleaned_script = re.sub(r'^SELECT pg_catalog\..*$', '', sql_script, flags=re.MULTILINE)
     return cleaned_script.strip()
 
+
 def generate_tables_ddl(host, port, database, user, password, tables):
     """
-    Generate a DDL for the tables in parameter using pg_dump.
+    Generate a cleaned DDL for the given tables using pg_dump, excluding:
+    - comments
+    - SET statements
+    - GRANT/REVOKE statements
+    - pg_catalog references
+    - ALTER SEQUENCE ... OWNER TO
+    - ALTER SEQUENCE ... OWNED BY
     """    
     try:
         # Build the `--table` arguments for pg_dump
         table_args = " ".join([f"--table {table}" for table in tables])
 
-        # Combine the command with piping
+        # Combine the command with piping and filtering
         command = f"""
         PGPASSWORD="{password}" pg_dump -h {host} -p {port} -U {user} -d {database} --schema-only {table_args} |
-        sed -e '/^--/d' |
-        sed -e '/^SET/d' 
+        sed -e '/^--/d' \
+            -e '/^SET/d' \
+            -e '/^GRANT/d' \
+            -e '/^REVOKE/d' \
+            -e '/pg_catalog/d' \
+            -e '/ALTER SEQUENCE .* OWNER TO/d' \
+            -e '/ALTER TABLE .* OWNER TO/d' \
+            -e '/ALTER SEQUENCE .* OWNED BY/d'
         """
 
         # Run the command in a shell
@@ -56,9 +69,10 @@ def generate_tables_ddl(host, port, database, user, password, tables):
             shell=True,
             check=True
         )
+
         ddl_s = result.stdout.replace("\n\n", "\n")
-        return remove_pg_catalog_lines(ddl_s)
-    
+        return ddl_s
+
     except subprocess.CalledProcessError as e:
         print(f"Error generating DDL: {e}")
         return None
