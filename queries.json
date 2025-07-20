@@ -264,12 +264,37 @@
         },
         {
             "category": "Database",
+            "id": "database_activity_grouped",
+            "description": "Database activity grouped by user, application, client address and state",
+            "sql": "SELECT datname, usename, application_name, client_addr, state, count(*) as nb FROM pg_stat_activity where datname!='None' group by datname, usename, application_name, client_addr, state;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW"
+        },   
+        {
+            "category": "Database",
             "id": "database_count_connexions",
             "description": "Count active connexions",
             "sql": "SELECT count(*) as nb FROM pg_stat_activity where datname!='None'",
             "type": "select",
             "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW"
         },
+        {
+            "category": "Database",
+            "id": "database_max_connexions",
+            "description": "Database max_connections setting",
+            "sql": "SELECT setting FROM pg_settings WHERE name = 'max_connections';",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/runtime-config-connection.html"
+        },
+        {
+            "category": "Database",
+            "id": "database_top_clients",
+            "description": "Database top 5 clients by connections",
+            "sql": "SELECT client_addr, COUNT(*) FILTER (WHERE state = 'active') AS active_connections, COUNT(*) FILTER (WHERE state = 'idle') AS idle_connections, COUNT(*) AS total_connections FROM pg_stat_activity WHERE client_addr IS NOT null GROUP BY client_addr ORDER BY total_connections desc LIMIT 5;",
+            "type": "select",
+            "reference": "https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ACTIVITY-VIEW"
+        },
+    
         {
             "category": "Database",
             "id": "database_count_conlicts",

@@ -74,28 +74,28 @@
                                     <div class="d-flex align-items-center">
                                         <h3 class="fw-extrabold mb-2">{{ dbinfo['cache'] }} %</h3>
                                         
-                                        <!-- Détermination de l'icône en fonction du cache hit ratio -->
+                                        <!-- hit ratio ICON -->
                                         {% if dbinfo['cache'] >= 99 %}
                                             <svg class="icon icon-sm text-success ms-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <path d="M9 12l2 2 4-4"></path>
-                                            </svg> <!-- ✅ Excellent (icône check vert) -->
+                                            </svg> <!-- ✅ Excellent) -->
                                         {% elif dbinfo['cache'] >= 95 %}
                                             <svg class="icon icon-sm text-primary ms-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <path d="M9 12h6"></path>
-                                            </svg> <!-- 👍 Good (icône tiret bleu) -->
+                                            </svg> <!-- 👍 Good -->
                                         {% elif dbinfo['cache'] >= 90 %}
                                             <svg class="icon icon-sm text-warning ms-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <path d="M12 8v4m0 4h.01"></path>
-                                            </svg> <!-- ⚠️ Average (icône warning orange) -->
+                                            </svg> <!-- ⚠️ Average  -->
                                         {% else %}
                                             <svg class="icon icon-sm text-danger ms-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <line x1="9" y1="9" x2="15" y2="15"></line>
                                                 <line x1="15" y1="9" x2="9" y2="15"></line>
-                                            </svg> <!-- ❌ Poor (icône croix rouge) -->
+                                            </svg> <!-- ❌ Poor -->
                                         {% endif %}
                                     </div>
                                 </a>
@@ -116,14 +116,39 @@
                               <a href="/generic/database_profile" class="btn btn-sm btn-primary">See all</a>
                           </div>
                         <div class="card-body">
-                            <!-- Project 1 -->
+                            <!-- Profile - Calls -->
                             {% for table in dbinfo['profile'] %}
                             <div class="row align-items-center mb-3">
-                                <div class="col-auto">
-                                    <svg class="icon icon-sm text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
-                                </div>
+                                <div class="col-auto text-dark"> 
+                                        <svg 
+                                        width="24" 
+                                        height="24" 
+                                        data-slot="icon" 
+                                        fill="none" 
+                                        stroke-width="1.5" 
+                                        stroke="currentColor"
+                                        style="color: grey;" 
+                                        viewBox="0 0 24 24" 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        aria-hidden="true"
+                                        >
+                                            <path 
+                                            stroke-linecap="round" 
+                                            stroke-linejoin="round" 
+                                            {% if table['query_type']=='select' %}
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Zm3.75 11.625a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
+                                            {% elif table['query_type']=='insert' %}
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                                            {% elif table['query_type']=='update' %}
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                                            {% else %}
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                                            {% endif %} 
+                                            </path>
+                                        </svg>
+                                </div>                                    
                                 <div class="col">
-                                    <div class="progress-wrapper">
+                                    <div class="progress-wrapper">            
                                         {% if table['query_type']=='select' %}
                                         <div class="progress-info">
                                             <div class="progress-label">
@@ -193,8 +218,33 @@
                             <!-- Project 1 -->
                             {% for table in dbinfo['profile'] %}
                             <div class="row align-items-center mb-3">
-                                <div class="col-auto">
-                                    <svg class="icon icon-sm text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
+                                <div class="col-auto text-dark"> 
+                                        <svg 
+                                        width="24" 
+                                        height="24" 
+                                        data-slot="icon" 
+                                        fill="none" 
+                                        stroke-width="1.5" 
+                                        stroke="currentColor"
+                                        style="color: grey;" 
+                                        viewBox="0 0 24 24" 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        aria-hidden="true"
+                                        >
+                                            <path 
+                                            stroke-linecap="round" 
+                                            stroke-linejoin="round" 
+                                            {% if table['query_type']=='select' %}
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Zm3.75 11.625a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
+                                            {% elif table['query_type']=='insert' %}
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                                            {% elif table['query_type']=='update' %}
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                                            {% else %}
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                                            {% endif %} 
+                                            </path>
+                                        </svg>
                                 </div>
                                 <div class="col">
                                     <div class="progress-wrapper">
@@ -264,12 +314,30 @@
                               <a href="/generic/table_size" class="btn btn-sm btn-primary">See all</a>
                           </div>
                         <div class="card-body">
-                            <!-- Project 1 -->
+                            <!-- Tables-->
                             {% for table in dbinfo['table_size'] %}
                             <div class="row align-items-center mb-3">
-                                <div class="col-auto">
-                                    <svg class="icon icon-sm text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
+                               <div class="col-auto text-dark"> 
+                                    <svg 
+                                    width="24" 
+                                    height="24" 
+                                    data-slot="icon" 
+                                    fill="none" 
+                                    stroke-width="1.5" 
+                                    stroke="currentColor"
+                                    style="color: blue;" 
+                                    viewBox="0 0 24 24" 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    aria-hidden="true"
+                                    >
+                                        <path 
+                                        stroke-linecap="round" 
+                                        stroke-linejoin="round" 
+                                        d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z">
+                                        ></path>
+                                    </svg>
                                 </div>
+
                                 <div class="col">
                                     <div class="progress-wrapper">
                                         <div class="progress-info">
@@ -283,7 +351,51 @@
                         </div>
                     </div>
                 </div>
-                
+                <div class="col-12 col-xxl-6 mb-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-header border-bottom d-flex align-items-center justify-content-between">
+                            <h2 class="fs-5 fw-bold mb-0">Top 5 clients</h2>
+                              <a href="/generic/database_activity_grouped" class="btn btn-sm btn-primary">See all</a>
+                          </div>
+                        <div class="card-body">
+                            <!-- Cients -->
+                            {% for client in dbinfo['top_clients'] %}
+                            <div class="row align-items-center mb-3">
+                                <div class="col-auto text-dark"> 
+                                    <svg 
+                                    width="24" 
+                                    height="24" 
+                                    data-slot="icon" 
+                                    fill="none" 
+                                    stroke-width="1.5" 
+                                    stroke="currentColor"
+                                    style="color: green;" 
+                                    viewBox="0 0 24 24" 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    aria-hidden="true"
+                                    >
+                                        <path 
+                                        stroke-linecap="round" 
+                                        stroke-linejoin="round" 
+                                        d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25">
+                                        ></path>
+                                    </svg>
+                                </div>
+                                <div class="col">
+                                    <div class="progress-wrapper">
+                                        <div class="progress-info">
+                                            <div class="h6 mb-0">{{ client['client_addr'] }}</div>
+                                            <div class="small fw-bold text-gray-500"><span> {{ client['total_connections'] }} connection(s)</span></div>
+                                            <div class="small fw-bold text-gray-500"><span> {{ client['active_connections'] }} active(s)</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>        
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>    
+            
             </div>
         </div>
         <div class="col-12 col-xl-4">
@@ -295,12 +407,12 @@
                             <div>
                                 <div class="h6 mb-0 d-flex align-items-center">
                                     <svg class="icon icon-xs text-gray-500 me-2" fill="green" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6" clip-rule="evenodd"></path></svg>
-                                    Connexions
+                                    Connections
                                 </div>
                             </div>
                             <div>
                                 <a href="/generic/database_activity" class="d-flex align-items-center fw-bold">
-                                    {{ dbinfo['connexions'] }}
+                                    {{ dbinfo['connexions'] }} / {{ dbinfo['max_connexions'] }}
                                     <svg class="icon icon-xs text-gray-500 me-2"  viewBox="0 0 20 20" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6"></path>
                                     </svg>
@@ -342,7 +454,147 @@
                         </div>
                     </div>
                 </div>
-            </div>           
+            </div>
+            
+            <div class="col-12 px-0 mb-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-header border-bottom d-flex align-items-center justify-content-between">
+                            <h2 class="fs-5 fw-bold mb-0">Issues on schema</h2>
+                              
+                          </div>
+                        <div class="card-body">
+                            <!-- Issues -->
+                            <div class="row align-items-center mb-3">
+                                <div class="col-auto text-dark">
+                                    <svg 
+                                    width="24" 
+                                    height="24" 
+                                    data-slot="icon" 
+                                    fill="none" 
+                                    stroke-width="1.5" 
+                                    stroke="currentColor"
+                                    {% if dbinfo['issue_no_pk'] > 0 %}
+                                    style="color: red;" 
+                                    {% endif %}
+                                    viewBox="0 0 24 24" 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    aria-hidden="true"
+                                    >
+                                        <path 
+                                        stroke-linecap="round" 
+                                        stroke-linejoin="round" 
+                                        d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.25-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z"
+                                        ></path>
+                                    </svg>
+                                </div>
+                                <div class="col">
+                                    <div class="progress-wrapper">
+                                        <div class="progress-info">
+                                            <div class="h6 mb-0"><a href="/generic/issue_no_pk">Tables without primary keys</a></div>
+                                            <div class="small fw-bold text-gray-500"><span> {{ dbinfo['issue_no_pk'] }}</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>        
+                            <div class="row align-items-center mb-3">
+                                <div class="col-auto text-dark"> 
+                                    <svg 
+                                    width="24" 
+                                    height="24" 
+                                    data-slot="icon" 
+                                    fill="none" 
+                                    stroke-width="1.5" 
+                                    stroke="currentColor"
+                                    {% if dbinfo['issue_idx_fk_missing'] > 0 %}
+                                    style="color: red;" 
+                                    {% endif %}
+                                    viewBox="0 0 24 24" 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    aria-hidden="true"
+                                    >
+                                        <path 
+                                        stroke-linecap="round" 
+                                        stroke-linejoin="round" 
+                                        d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.25-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z"
+                                        ></path>
+                                    </svg>
+                                </div>
+                                <div class="col">
+                                    <div class="progress-wrapper">
+                                        <div class="progress-info">
+                                            <div class="h6 mb-0"><a href="/generic/issue_idx_fk_missing">Missing indexes on foreign keys</a></div>
+                                            <div class="small fw-bold text-gray-500"><span> {{ dbinfo['issue_idx_fk_missing'] }}</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> 
+                            <div class="row align-items-center mb-3">
+                                <div class="col-auto text-dark"> 
+                                    <svg 
+                                    width="24" 
+                                    height="24" 
+                                    data-slot="icon" 
+                                    fill="none" 
+                                    stroke-width="1.5" 
+                                    stroke="currentColor"
+                                    {% if dbinfo['issue_idx_redundant'] > 0 %}
+                                    style="color: red;" 
+                                    {% endif %}
+                                    viewBox="0 0 24 24" 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    aria-hidden="true"
+                                    >
+                                        <path 
+                                        stroke-linecap="round" 
+                                        stroke-linejoin="round" 
+                                        d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.25-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z"
+                                        ></path>
+                                    </svg>
+                                </div>
+                                <div class="col">
+                                    <div class="progress-wrapper">
+                                        <div class="progress-info">
+                                            <div class="h6 mb-0"><a href="/generic/issue_idx_redundant">Redundants indexes</a></div>
+                                            <div class="small fw-bold text-gray-500"><span> {{ dbinfo['issue_idx_redundant'] }}</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row align-items-center mb-3">
+                                <div class="col-auto text-dark"> 
+                                    <svg 
+                                    width="24" 
+                                    height="24" 
+                                    data-slot="icon" 
+                                    fill="none" 
+                                    stroke-width="1.5" 
+                                    stroke="currentColor"
+                                    {% if dbinfo['issue_idx_fk_datatype'] > 0 %}
+                                    style="color: red;" 
+                                    {% endif %}
+                                    viewBox="0 0 24 24" 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    aria-hidden="true"
+                                    >
+                                        <path 
+                                        stroke-linecap="round" 
+                                        stroke-linejoin="round" 
+                                        d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.25-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z"
+                                        ></path>
+                                    </svg>
+                                </div>
+                                <div class="col">
+                                    <div class="progress-wrapper">
+                                        <div class="progress-info">
+                                            <div class="h6 mb-0"><a href="/generic/issue_idx_fk_datatype">Datatype on foreign keys are different</a></div>
+                                            <div class="small fw-bold text-gray-500"><span> {{ dbinfo['issue_idx_fk_datatype'] }}</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                                                         
+                        </div>
+                    </div>
+                </div>   
         </div>
     </div>
 

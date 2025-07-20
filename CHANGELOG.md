@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.9.5] - 2025-07-20
+
+### Features
+- Add top 5 clients on dashboard
+- Add issues on dashboard
+- Add max connections on dashboard
+- Trying to improve the Dashboard UI 
+
 ## [1.9.4] - 2025-07-18
 
 ### Bug Fixes

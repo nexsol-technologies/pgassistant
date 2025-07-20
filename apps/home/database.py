@@ -225,6 +225,25 @@ def get_db_info(db_config,con=None):
 
             connexions, _= db_query(con,'database_count_connexions')
             info['connexions']=connexions[0]['nb']
+
+            max_connexions, _= db_query(con,'database_max_connexions')
+            info['max_connexions']=max_connexions[0]['setting']
+
+            database_top_clients, _= db_query(con,'database_top_clients')
+            info['top_clients']=database_top_clients
+
+            issue_idx_redundant, _= db_query(con,'issue_idx_redundant')
+            info['issue_idx_redundant'] = len(issue_idx_redundant)
+
+            issue_idx_fk_missing, _= db_query(con,'issue_idx_fk_missing')
+            info['issue_idx_fk_missing'] = len(issue_idx_fk_missing)    
+
+            issue_no_pk, _= db_query(con,'issue_no_pk')
+            info['issue_no_pk'] = len(issue_no_pk)  
+
+            issue_idx_fk_datatype, _= db_query(con,'issue_idx_fk_datatype')
+            info['issue_idx_fk_datatype'] = len(issue_idx_fk_datatype)
+
             try:
                 conflicts, _=  db_query(con,'database_count_conlicts')
                 info['conflicts']=conflicts[0]['nb']
