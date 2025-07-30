@@ -55,6 +55,7 @@ def db_exec(conn, sql):
     :param conn: The active database connection.
     :param sql: The SQL statement to execute.
     """    
+    sql = '/* launched by pgAssistant */ ' + sql
     conn.set_session(autocommit=True)
     cursor = conn.cursor()
     cursor.execute(sql)
@@ -67,6 +68,7 @@ def db_exec_recommandation(conn, sql):
     :param sql: The SQL clause to execute.
     :return: A success message or error message.
     """
+    sql = '/* launched by pgAssistant */ ' + sql
     try:
         conn.set_session(autocommit=True)
         cursor = conn.cursor()
@@ -92,6 +94,7 @@ def execute_and_fetch(cursor, query):
     :param query: The SQL query to execute.
     :return: Fetched query results.
     """    
+    query = '/* launched by pgAssistant */ ' + query
     cursor.execute(query)
     res = cursor.fetchall()
     cursor.close()
@@ -194,7 +197,7 @@ def get_db_info(db_config,con=None):
             # Enable pg_stat_statements_enable if it is not enabled (it is not enable by default)
             try:
                 cursor = con.cursor()
-                cursor.execute('CREATE EXTENSION IF NOT EXISTS pg_stat_statements;')
+                cursor.execute('/* launched by pgAssistant */ CREATE EXTENSION IF NOT EXISTS pg_stat_statements;')
             except psycopg2.Error as e:  # Catch PostgreSQL-specific errors
                 error_msg = f"Error while enabling pg_stat_statements: {e.pgcode or 'Unknown Code'} - {e.pgerror or str(e)}"
                 info["error"] = error_msg  

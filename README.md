@@ -29,9 +29,14 @@ PgAssistant is an open-source tool designed to help developers understand and op
     - Analyze query, use pg_stats to get the most common values of a given parameter. See sample [here](media/analyze_parameters.png)
     - Analyze query, get the indexe coverage of each table and column of the query. See sample [here](media/index_coverage.png)
     - On dashboard, add a link on Hit Cache Ratio zooming on cache usage by table. Quick access on top queries with low usage of cache / index cache. See sample [here](media/cache_usage.png)
-## Screen shots
+
+---
+
+## Screen shot
 
 <img src="media/dashboard.png" alt="Dashboard" height="640px"/>
+
+---
 
 ## Mindset
 
@@ -45,101 +50,16 @@ Please use pgAssistant in a non-production environment. The purpose of this tool
 
 Finally, pgAssistant was designed to help developers design and understand their PostgreSQL database. The initial idea was clearly to make developers as autonomous as possible, educate them, and also reduce the need for DBA expertise.
 
+---
 
-## Before you begin
+## Read the doc
 
-pgAssistant needs the **pg_stat_statements** postgresql module to run. 
+You can find [here](https://beh74.github.io/pgassistant-blog/) the pgAssistant Blog (documentation, posts)
 
-To activate this module on your database is very simple. Below, you will find an example of how to activate it if you are in a Docker environment, as well as the PostgreSQL documentation.
-
-- Docker environment sample here : https://github.com/nexsol-technologies/pgassistant-postgres-sample/tree/main
-- Postgresql documentation here : https://www.postgresql.org/docs/current/pgstatstatements.html
+---
 
 ## Special thanks
 
 Not being a front-end developer, I would like to thank the team that developed Volt BootStrap 5, which is available here: https://github.com/themesberg/volt-bootstrap-5-dashboard. Thank you guys, you saved my life !
 I've used this project to develop the application' interface.
-
-## Using LLM with pgAssistant
-
-Take a look at this documentation : [here](LLM.md)
-
-## Understanding the myqueries.json file
-
-**myqueries.json** file is used to store your helpfull queries. 
-
-Each querie you add to the json file can be searched and executed by pgAssistant.
-
-The JSON format is very simple :
-```json
-        {
-            "id": "db_version",
-            "description": "Database version",
-            "category": "Database",        
-            "sql": "SHOW server_version;",
-            "type": "select"
-            "reference": "https://www.postgresql.org/docs/current/sql-show.html"
-        }
-```
-
-- **id** A unique ID of the query
-- **description** The description of your SQL query
-- **categorie** A SQL category like Database, Issue, Table, Index or whatever you want
-- **sql** The SQL query ended with a ";"
-- **reference** An URL on the query documentation or your project documentation
-- **type** 2 sql types are alowed 
-   - select : performing a select
-   - param_query : a select query with parameters. Each parameter must be in the format $1, $2, etc.
-
-## ✅ Start in `Docker` and use the Nexsol technologies image
-
-Use this [docker-compse.yml](docker-compose/docker-compose.yml) and run :
-
-```bash
-docker compose up 
-```
-
-Visit `http://localhost:8080/database.html` in your browser. The app should be up & running.
-
-
-## ✅ Manual Docker Build
-
-```bash
-docker build . -t mypgassistant:1.0 
-```
-
-<br />
-
-### 👉 Set Up for `Unix`, `MacOS` 
-
-> Install modules via `VENV`  
-
-```bash
-$ virtualenv env
-$ source env/bin/activate
-$ pip3 install -r requirements.txt
-```
-
-<br />
-
-> Set Up Flask Environment
-
-```bash
-$ export FLASK_APP=run.py
-```
-
-<br />
-
-> Start the app
-
-```bash
-$ flask run
-// OR
-$ flask run --cert=adhoc # For HTTPS server
-```
-
-At this point, the app runs at `http://127.0.0.1:5000/database.html`. 
-
-<br />
-
 

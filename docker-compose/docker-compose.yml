@@ -6,7 +6,7 @@ services:
       - OPENAI_API_KEY=nothing
       - OPENAI_API_MODEL=codestral:latest
       - LOCAL_LLM_URI=http://host.docker.internal:11434/v1/
-      - SECRET_KEY=bertrand
+      - SECRET_KEY=mySecretKeyforPGAssistant
     ports:
       - "8080:5005"
     volumes:

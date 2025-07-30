@@ -1,5 +1,17 @@
 # Change Log
 
+## [1.9.6] - 2025-07-30
+
+### Features
+- A new blog built with Hugo is now available for pgAssistant. It covers usage tips, performance advice, and deployment best practices. [Check it out](https://beh74.github.io/pgassistant-blog/). 
+    - Source code is [here](https://github.com/beh74/pgassistant-blog/tree/main/content). Everyone is welcome to contribute!
+    - The site is automatically deployed to GitHub Pages using a GitHub Actions workflow. Any push to the main branch triggers a rebuild and redeploy. 
+    - Work in progress !
+- Prefix all queries performed by pgAssistant with : /* launched by pgAssistant */ 
+- Optimizing the issue "Indexe missing on foreign keys" by giving recommandations, depending on the size of the referenced table [documentation here](https://beh74.github.io/pgassistant-blog/doc/issue_index_fk/).
+- Experimental : Add a vacuum query to try to optimize the default vacuum parameters for each table. See : [documentation here](https://beh74.github.io/pgassistant-blog/post/vaccum/)
+
+
 ## [1.9.5] - 2025-07-20
 
 ### Features
